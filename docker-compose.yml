@@ -1,0 +1,83 @@
+# @author Anghel CC
+# PrototipoTransmetro — Orquestación de servicios
+# Sistema de Control Integral Transmetro Guatemala 2026
+
+services:
+  # ─── Base de datos PostgreSQL ───────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: transmetro_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: transmetro_db
+      POSTGRES_USER: transmetro_user
+      POSTGRES_PASSWORD: transmetro_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transmetro_user -d transmetro_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - transmetro-net
+
+  # ─── Backend API (Node.js + Express + Socket.io) ────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: transmetro_backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: transmetro_db
+      DB_USER: transmetro_user
+      DB_PASS: transmetro_pass_2026
+      JWT_SECRET: transmetro_jwt_secret_2026_anghel
+      JWT_EXPIRES_IN: 8h
+      CORS_ORIGIN: http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - transmetro-net
+
+  # ─── Frontend (React + Vite) ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: transmetro_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+      VITE_SOCKET_URL: http://localhost:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - transmetro-net
+
+volumes:
+  postgres-data:
+    name: transmetro_postgres_data
+
+networks:
+  transmetro-net:
+    name: transmetro_network
+    driver: bridge

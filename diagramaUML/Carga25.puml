@@ -1,0 +1,29 @@
+@startuml
+title Secuencia: Validación de Eficiencia de Carga (REQ-0006)
+skinparam style strictuml
+
+actor "Operador Estación" as Operador
+participant "Sistema Central" as Sistema
+database "PostgreSQL" as DB
+participant "Bus / Piloto" as Bus
+
+Operador -> Sistema: Solicitar despacho de unidad
+activate Sistema
+
+Sistema -> DB: Consultar ocupación actual del bus
+DB --> Sistema: % de carga (basado en Tarjeta Ciudadana)
+
+alt Carga < 25%
+    Sistema -> Sistema: Iniciar cronómetro de 5 minutos
+    Sistema -> Operador: Mostrar estado: "ESPERA OBLIGATORIA"
+    Sistema -> Bus: Bloquear autorización de salida
+    ... 5 minutos después ...
+    Sistema -> Operador: Notificar: "TIEMPO CUMPLIDO"
+    Sistema -> Bus: Autorizar salida
+else Carga >= 25%
+    Sistema -> Bus: Autorizar salida inmediata
+    Sistema -> Operador: Estado: "DESPACHADO"
+end
+
+deactivate Sistema
+@enduml

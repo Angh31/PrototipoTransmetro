@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+actor "Pasajero" as Pasajero
+rectangle "Interfaz de Usuario Pública" {
+  usecase "Consultar Ocupación de Unidades en Tiempo Real" as UC10
+  usecase "Visualizar Tiempos Estimados de Arribo" as UC_Tiempos
+}
+Pasajero --> UC10
+Pasajero --> UC_Tiempos
+@enduml

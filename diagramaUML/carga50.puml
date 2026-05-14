@@ -1,0 +1,26 @@
+@startuml
+title Secuencia: Alerta de Saturación y Despacho (REQ-0005)
+skinparam style strictuml
+
+actor "Operador Estación" as Operador
+participant "Sistema Central" as Sistema
+database "PostgreSQL" as DB
+participant "Dashboard Supervisor" as Dashboard
+
+Operador -> Sistema: Registrar ingreso pasajero (Tarjeta Ciudadana)
+activate Sistema
+Sistema -> DB: Actualizar Ocupacion_Actual
+Sistema -> DB: Consultar Capacidad_Maxima
+DB --> Sistema: Datos de estación
+Sistema -> Sistema: Calcular: (Ocupacion / Capacidad) >= 0.50
+
+alt Capacidad >= 50%
+    Sistema -> Dashboard: ¡DISPARAR ALERTA ROJA! (Socket.io)
+    Sistema -> Dashboard: Solicitar bus de refuerzo automático
+    Dashboard --> Sistema: Confirmar recepción
+else Capacidad < 50%
+    Sistema --> Operador: Estado Normal
+end
+
+deactivate Sistema
+@enduml

@@ -1,0 +1,50 @@
+/**
+ * @file App.jsx
+ * @author Anghel CC
+ * @project PrototipoTransmetro — Sistema de Control Integral Transmetro Guatemala
+ */
+
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout         from './components/layout/Layout';
+import LoginPage      from './pages/LoginPage';
+import DashboardPage  from './pages/DashboardPage';
+import OperacionPage  from './pages/OperacionPage';
+import LineasPage     from './pages/LineasPage';
+import EstacionesPage from './pages/EstacionesPage';
+import BusesPage      from './pages/BusesPage';
+import PilotosPage    from './pages/PilotosPage';
+import AlertasPage    from './pages/AlertasPage';
+
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return (
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'var(--text3)', gap:'10px' }}>
+      <div style={{ width:'16px', height:'16px', border:'2px solid var(--border2)', borderTopColor:'var(--cyan)', borderRadius:'50%', animation:'spin 0.7s linear infinite' }} />
+      Iniciando sistema...
+    </div>
+  );
+  return user ? children : <Navigate to="/login" replace />;
+};
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route index              element={<DashboardPage />} />
+            <Route path="operacion"  element={<OperacionPage />} />
+            <Route path="lineas"     element={<LineasPage />} />
+            <Route path="estaciones" element={<EstacionesPage />} />
+            <Route path="buses"      element={<BusesPage />} />
+            <Route path="pilotos"    element={<PilotosPage />} />
+            <Route path="alertas"    element={<AlertasPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

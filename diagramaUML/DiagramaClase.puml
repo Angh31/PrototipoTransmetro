@@ -1,0 +1,71 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "Sistema de Control Integral Transmetro" {
+
+  class Bus {
+    - String ID_Bus
+    - String Placa
+    - int Capacidad_Pasajeros
+    - int Ocupacion_Actual
+    + validarParqueo(): boolean
+    + validarCarga25(): void
+  }
+
+  class Parqueo {
+    - String ID_Parqueo
+    - String Ubicacion
+    - String Tipo // Normal o Eléctrico para L5
+    - boolean Disponible
+  }
+
+  class Piloto {
+    - String ID_Piloto
+    - String Nombre
+    - String Historial_Educativo
+    - String Direccion
+    - String Contacto
+  }
+
+  class Estacion {
+    - String ID_Estacion
+    - String Nombre
+    - int Capacidad_Maxima
+    - int Ocupacion_Actual
+    + generarAlerta50(): void
+  }
+
+  class Linea {
+    - String ID_Linea
+    - String Color
+    - float Longitud_Total_KM
+    + calcularAhorro(): float
+  }
+
+  class Acceso {
+    - String ID_Acceso
+    - String Descripcion
+  }
+
+  class Usuario {
+    - String ID_Usuario
+    - String Nombre
+    - String Rol // Administrador, Operador, Supervisor, Guardia
+    - String Email
+  }
+
+  ' Relaciones basadas en Reglas de Negocio
+  Bus "1" *-- "1" Parqueo : REQ-0001: Asignación Obligatoria >
+  Linea "1" *-- "1..*" Estacion : REQ-0003: Secuencia Lógica >
+  Linea "1" o-- "*" Bus : gestiona >
+  Estacion "1" *-- "1..*" Acceso : posee >
+  Bus "*" -- "1" Piloto : REQ-0002: Expediente Digital >
+  
+  ' Relaciones por Roles (REQ-0007)
+  Estacion "1" -- "1" Usuario : operada por (Operador) >
+  Acceso "1" -- "1..*" Usuario : vigilado por (Guardia) >
+  Linea "*" -- "1" Usuario : coordinada por (Supervisor) >
+
+}
+@enduml

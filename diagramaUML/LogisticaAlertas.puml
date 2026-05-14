@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+actor "Supervisor de Flota" as Supervisor
+rectangle "Módulo de Supervisión" {
+  usecase "Registrar Unidades y Parqueos Obligatorios (REQ-0001)" as UC1
+  usecase "Gestionar Alertas de Saturación 50% (REQ-0005)" as UC5
+}
+Supervisor --> UC1
+Supervisor --> UC5
+@enduml

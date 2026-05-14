@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+actor "Guardia de Seguridad" as Guardia
+rectangle "Módulo de Seguridad" {
+  usecase "Monitorear Accesos de Estación" as UC9
+  usecase "Verificar Autorización de Unidades" as UC_Verif
+}
+Guardia --> UC9
+Guardia --> UC_Verif
+@enduml

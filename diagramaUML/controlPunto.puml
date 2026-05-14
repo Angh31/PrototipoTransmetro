@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+actor "Operador de Estación" as Operador
+rectangle "Módulo de Estación" {
+  usecase "Registrar Movimientos y Pasajeros (REQ-0007)" as UC7
+  usecase "Validar Eficiencia de Carga 25% (REQ-0006)" as UC6
+}
+Operador --> UC7
+Operador --> UC6
+@enduml

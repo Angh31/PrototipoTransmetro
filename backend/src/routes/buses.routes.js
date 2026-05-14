@@ -1,0 +1,11 @@
+const { Router } = require('express');
+const { authMiddleware } = require('../middleware/auth');
+const { getBuses, getBusById, createBus, cambiarParqueo, cambiarLinea, alertaEspera } = require('../controllers/buses.controller');
+const router = Router();
+router.get('/',              authMiddleware, getBuses);
+router.get('/:id',           authMiddleware, getBusById);
+router.post('/',             authMiddleware, createBus);
+router.put('/:id/parqueo',   authMiddleware, cambiarParqueo);
+router.put('/:id/linea',     authMiddleware, cambiarLinea);
+router.post('/:id/alerta-espera', authMiddleware, alertaEspera);
+module.exports = router;

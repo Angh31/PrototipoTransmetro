@@ -1,0 +1,10 @@
+const { Router } = require('express');
+const { authMiddleware } = require('../middleware/auth');
+const { getLineas, getLineaById, getBusesByLinea, createLinea, updateLinea } = require('../controllers/lineas.controller');
+const router = Router();
+router.get('/',          authMiddleware, getLineas);
+router.get('/:id',       authMiddleware, getLineaById);
+router.get('/:id/buses', authMiddleware, getBusesByLinea);
+router.post('/',         authMiddleware, createLinea);
+router.put('/:id',       authMiddleware, updateLinea);
+module.exports = router;

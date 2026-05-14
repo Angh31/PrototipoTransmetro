@@ -1,0 +1,15 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+actor "Administrador General" as Admin
+rectangle "Módulo de Administración" {
+  usecase "Configurar Secuencia Lógica de Rutas (REQ-0003)" as UC3
+  usecase "Visualizar Reportes de Ahorro y Distancias (REQ-0004)" as UC4
+  usecase "Gestionar Expedientes Digitales de Pilotos (REQ-0002)" as UC2
+  usecase "Registrar Unidades y Flota" as UC_Flota
+}
+Admin --> UC3
+Admin --> UC4
+Admin --> UC2
+Admin --> UC_Flota
+@enduml

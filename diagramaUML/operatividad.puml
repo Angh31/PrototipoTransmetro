@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+actor "Piloto" as Piloto
+rectangle "Módulo de Piloto" {
+  usecase "Consultar Turnos y Rutas Asignadas" as UC8
+  usecase "Reportar Recorridos Finalizados" as UC_Reporte
+}
+Piloto --> UC8
+Piloto --> UC_Reporte
+@enduml

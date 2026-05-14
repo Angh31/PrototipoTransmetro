@@ -1,0 +1,108 @@
+/* PrototipoTransmetro — Design System | @author Anghel CC */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #070D13;
+  --bg2:       #0B1520;
+  --bg3:       #0F1E2E;
+  --surface:   #0D1C2A;
+  --surface2:  #142535;
+  --border:    #1A3049;
+  --border2:   #234060;
+  --cyan:      #00D4FF;
+  --cyan2:     #00A8CC;
+  --cyan-dim:  rgba(0,212,255,0.10);
+  --cyan-glow: rgba(0,212,255,0.22);
+  --red:       #FF3B30;
+  --red-dim:   rgba(255,59,48,0.14);
+  --amber:     #FFB800;
+  --amber-dim: rgba(255,184,0,0.14);
+  --green:     #00E676;
+  --green-dim: rgba(0,230,118,0.12);
+  --text:      #DCE9F4;
+  --text2:     #7A9DB8;
+  --text3:     #3D6080;
+  --font-d: 'Rajdhani', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+  --r:  6px;
+  --r2: 10px;
+}
+
+html { font-size: 15px; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── Core Animations ───────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes pulseRing {
+  0%   { transform:scale(1); opacity:1; }
+  100% { transform:scale(2.4); opacity:0; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes slideInRight {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.08); }
+  50%      { box-shadow: 0 0 40px rgba(0,212,255,0.18); }
+}
+
+.fade-up   { animation: fadeUp 0.35s ease both; }
+.fade-up-1 { animation: fadeUp 0.35s 0.05s ease both; }
+.fade-up-2 { animation: fadeUp 0.35s 0.10s ease both; }
+.fade-up-3 { animation: fadeUp 0.35s 0.15s ease both; }
+.fade-up-4 { animation: fadeUp 0.35s 0.20s ease both; }
+.fade-up-5 { animation: fadeUp 0.35s 0.25s ease both; }
+
+/* ── Glassmorphism ─────────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(13, 28, 42, 0.65);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+/* ── Selection ─────────────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(0, 212, 255, 0.25);
+  color: var(--text);
+}

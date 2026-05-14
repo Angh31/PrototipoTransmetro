@@ -1,0 +1,46 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Administrador General" as Admin
+actor "Operador de Estación" as Operador
+actor "Supervisor de Flota" as Supervisor
+actor "Piloto" as Piloto
+actor "Guardia de Seguridad" as Guardia
+actor "Pasajero" as Pasajero
+
+rectangle "Sistema de Control Integral Transmetro" {
+  usecase "Registrar Unidades y Parqueos (REQ-0001)" as UC1
+  usecase "Gestionar Expedientes de Pilotos (REQ-0002)" as UC2
+  usecase "Configurar Secuencia Lógica de Rutas (REQ-0003)" as UC3
+  usecase "Visualizar Reportes de Ahorro (REQ-0004)" as UC4
+  usecase "Gestionar Alertas de Saturación 50% (REQ-0005)" as UC5
+  usecase "Validar Eficiencia de Carga 25% (REQ-0006)" as UC6
+  usecase "Registrar Movimientos y Pasajeros (REQ-0007)" as UC7
+  usecase "Consultar Turnos y Recorridos" as UC8
+  usecase "Monitorear Accesos Autorizados" as UC9
+  usecase "Consultar Ocupación en Tiempo Real" as UC10
+}
+
+' Relaciones del Administrador (Gestión total)
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC7
+
+' Relaciones del Operador (Control en estación)
+Operador --> UC7
+Operador --> UC6
+
+' Relaciones del Supervisor (Logística y Alertas)
+Supervisor --> UC1
+Supervisor --> UC5
+
+' Relaciones de actores secundarios
+Piloto --> UC8
+Guardia --> UC9
+Pasajero --> UC10
+
+@enduml
