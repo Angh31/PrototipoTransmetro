@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import api from '../services/api';
 import { conectarSocket } from '../services/socket';
 import { PageHeader, StatCard, Badge, AlertDot, Loader } from '../components/ui';
+import MapaRed from '../components/map/MapaRed';
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
@@ -26,15 +27,18 @@ export default function DashboardPage() {
   const [loading, setLoading]   = useState(true);
   const [alertas, setAlertas]   = useState([]);
   const [liveAlert, setLiveAlert] = useState(null);
+  const [red, setRed]           = useState(null); // estaciones geolocalizadas + recorridos para el mapa
 
   const load = async () => {
     try {
-      const [dash, alts] = await Promise.all([
+      const [dash, alts, redRes] = await Promise.all([
         api.get('/dashboard'),
         api.get('/alertas/activas'),
+        api.get('/publico/red'),
       ]);
       setData(dash.data.data);
       setAlertas(alts.data.data);
+      setRed(redRes.data.data);
     } catch {}
     finally { setLoading(false); }
   };
@@ -96,6 +100,19 @@ export default function DashboardPage() {
             sub={`${data?.buses?.electricos} eléctricos BYD`} />
           <StatCard label="Alertas activas"   value={data?.alertas?.pendientes}        icon="◉" accent={data?.alertas?.pendientes > 0 ? 'var(--red)' : 'var(--green)'} delay={4}
             sub={`${data?.alertas?.alta} alta · ${data?.alertas?.critica} crítica`} />
+        </div>
+
+        {/* Mapa interactivo de la red */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
+              Mapa de la red
+            </div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>
+              OpenStreetMap · {red?.estaciones?.filter(e => e.lat).length || 0} estaciones · {red?.recorridos?.length || 0} líneas trazadas
+            </span>
+          </div>
+          <MapaRed estaciones={red?.estaciones || []} recorridos={red?.recorridos || []} alto={420} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px' }}>

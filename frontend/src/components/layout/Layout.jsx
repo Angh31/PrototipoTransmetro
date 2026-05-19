@@ -65,7 +65,7 @@ export default function Layout() {
         }}>
           {!collapsed && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <img src="/LogoT.png" alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+              <img src="/logo-transmetro.png" alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }}
                 onError={e => e.target.style.display='none'} />
               <div>
                 <div style={{ fontFamily: 'var(--font-d)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--cyan)', letterSpacing: '0.04em' }}>TRANSMETRO</div>

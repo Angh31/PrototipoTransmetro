@@ -15,6 +15,8 @@ import EstacionesPage from './pages/EstacionesPage';
 import BusesPage      from './pages/BusesPage';
 import PilotosPage    from './pages/PilotosPage';
 import AlertasPage    from './pages/AlertasPage';
+import PublicoPage    from './pages/PublicoPage';
+import { Toast }      from './components/ui';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -24,15 +26,19 @@ const ProtectedRoute = ({ children }) => {
       Iniciando sistema...
     </div>
   );
-  return user ? children : <Navigate to="/login" replace />;
+  // Si no hay sesión → enviamos al usuario a la vista pública (la app "abre" como portal de pasajeros).
+  // El personal entra al sistema desde el botón "Acceso al Sistema" del header público.
+  return user ? children : <Navigate to="/publico" replace />;
 };
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Toast />
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login"   element={<LoginPage />} />
+          <Route path="/publico" element={<PublicoPage />} />
           <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index              element={<DashboardPage />} />
             <Route path="operacion"  element={<OperacionPage />} />

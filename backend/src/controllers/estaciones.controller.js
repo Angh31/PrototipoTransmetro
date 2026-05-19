@@ -13,6 +13,7 @@ const getEstaciones = async (req, res, next) => {
   try {
     const { rows } = await pool.query(`
       SELECT e.id_estacion, e.nombre, e.capacidad_max, e.activa,
+             e.lat, e.lng,
              m.nombre AS municipio,
              COUNT(DISTINCT le.id_linea)  AS total_lineas,
              COUNT(DISTINCT a.id_acceso)  AS total_accesos
@@ -115,4 +116,36 @@ const alertaCapacidad = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getEstaciones, getEstacionById, getAccesosByEstacion, alertaCapacidad };
+// POST /api/estaciones
+const crearEstacion = async (req, res, next) => {
+  try {
+    const { nombre, capacidad_max, id_municipio } = req.body;
+    if (!nombre || !capacidad_max || !id_municipio) {
+      return res.status(400).json({ ok: false, message: 'nombre, capacidad_max e id_municipio son requeridos' });
+    }
+    const { rows } = await pool.query(`
+      INSERT INTO estaciones (nombre, capacidad_max, id_municipio)
+      VALUES ($1, $2, $3) RETURNING *
+    `, [nombre, capacidad_max, id_municipio]);
+    res.status(201).json({ ok: true, data: rows[0] });
+  } catch (err) { next(err); }
+};
+
+// PUT /api/estaciones/:id
+const actualizarEstacion = async (req, res, next) => {
+  try {
+    const { nombre, capacidad_max, activa } = req.body;
+    const { rows } = await pool.query(`
+      UPDATE estaciones SET
+        nombre        = COALESCE($1, nombre),
+        capacidad_max = COALESCE($2, capacidad_max),
+        activa        = COALESCE($3, activa)
+      WHERE id_estacion = $4 RETURNING *
+    `, [nombre, capacidad_max, activa, req.params.id]);
+    if (!rows.length)
+      return res.status(404).json({ ok: false, message: 'Estación no encontrada' });
+    res.json({ ok: true, data: rows[0] });
+  } catch (err) { next(err); }
+};
+
+module.exports = { getEstaciones, getEstacionById, getAccesosByEstacion, alertaCapacidad, crearEstacion, actualizarEstacion };

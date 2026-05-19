@@ -5,6 +5,8 @@
  * @project PrototipoTransmetro
  */
 
+import { useEffect, useState } from 'react';
+
 // ── PageHeader ────────────────────────────────────────────────────────────────
 export const PageHeader = ({ title, subtitle, actions }) => (
   <div style={{
@@ -128,7 +130,7 @@ export const Loader = () => (
 );
 
 // ── Btn ───────────────────────────────────────────────────────────────────────
-export const Btn = ({ children, onClick, variant = 'primary', small, disabled }) => {
+export const Btn = ({ children, onClick, variant = 'primary', small, disabled, type = 'button', style, ghost, danger, ...rest }) => {
   const base = {
     border: 'none', borderRadius: 'var(--r)',
     fontFamily: 'var(--font-d)', fontWeight: 600,
@@ -144,10 +146,12 @@ export const Btn = ({ children, onClick, variant = 'primary', small, disabled })
     danger:   { background: 'var(--red-dim)', color: 'var(--red)', border: '1px solid rgba(255,59,48,0.3)' },
     ghost:    { background: 'var(--surface2)', color: 'var(--text2)', border: '1px solid var(--border)' },
   };
+  const resolvedVariant = danger ? 'danger' : ghost ? 'ghost' : variant;
   return (
-    <button style={{ ...base, ...variants[variant] }} onClick={onClick} disabled={disabled}
+    <button type={type} style={{ ...base, ...variants[resolvedVariant], ...style }} onClick={onClick} disabled={disabled}
       onMouseEnter={e => !disabled && (e.target.style.opacity = '0.82')}
       onMouseLeave={e => e.target.style.opacity = '1'}
+      {...rest}
     >
       {children}
     </button>
@@ -163,5 +167,59 @@ export const AlertDot = ({ nivel }) => {
       <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: color, opacity: 0.3, animation: 'pulseRing 1.6s ease-out infinite' }} />
       <span style={{ position: 'absolute', inset: '2px', borderRadius: '50%', background: color }} />
     </span>
+  );
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+// Sistema global de avisos. Disparar con:
+//   window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, kind } }))
+// kind: 'error' | 'success' | 'info'  (por defecto 'info')
+export const Toast = () => {
+  const [msgs, setMsgs] = useState([]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      const { message, kind = 'info' } = e.detail || {};
+      if (!message) return;
+      const id = Date.now() + Math.random();
+      setMsgs(prev => [...prev, { id, message, kind }]);
+      setTimeout(() => setMsgs(prev => prev.filter(m => m.id !== id)), 5000);
+    };
+    window.addEventListener('app:toast', handler);
+    return () => window.removeEventListener('app:toast', handler);
+  }, []);
+
+  if (msgs.length === 0) return null;
+
+  const palette = {
+    error:   { color: 'var(--red)',   bg: 'var(--red-dim)',   borde: 'rgba(255,59,48,0.35)' },
+    success: { color: 'var(--green)', bg: 'var(--green-dim)', borde: 'rgba(0,230,118,0.35)' },
+    info:    { color: 'var(--cyan)',  bg: 'var(--cyan-dim)',  borde: 'rgba(0,212,255,0.35)' },
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+      display: 'flex', flexDirection: 'column', gap: '8px',
+      pointerEvents: 'none',
+    }}>
+      {msgs.map(m => {
+        const p = palette[m.kind] || palette.info;
+        return (
+          <div key={m.id} className="fade-up" style={{
+            background: p.bg, border: `1px solid ${p.borde}`, borderLeft: `3px solid ${p.color}`,
+            borderRadius: 'var(--r)', padding: '12px 16px',
+            color: 'var(--text)', fontSize: '0.85rem',
+            minWidth: '260px', maxWidth: '380px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+            pointerEvents: 'auto',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}>
+            {m.message}
+          </div>
+        );
+      })}
+    </div>
   );
 };

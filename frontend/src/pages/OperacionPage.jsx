@@ -1,50 +1,78 @@
 /**
  * @file pages/OperacionPage.jsx
- * @description Simulador de Centro de Mando / Operación (Validación de REQ-0001, REQ-0005, REQ-0006)
+ * @description Centro de Mando — Validación de REQ-0001, REQ-0005 y REQ-0006
  * @author Anghel CC
  * @project PrototipoTransmetro — Sistema de Control Integral Transmetro Guatemala
  */
 
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { PageHeader, Btn, Loader, StatCard } from '../components/ui';
+import { PageHeader, Btn, Loader, StatCard, Badge } from '../components/ui';
 
-// Paleta institucional requerida por el Prompt Maestro
-const colors = {
-  verdeInstitucional: '#00A859', // Movilidad
-  azulTecnologico:    '#0055A4', // Seguridad de datos
-  blanco:             '#FFFFFF',
-  grisPlata:          '#E0E0E0'
+const inputStyle = {
+  padding: '9px 12px', background: 'var(--bg3)',
+  border: '1px solid var(--border)', color: 'var(--text)',
+  borderRadius: 'var(--r)', fontFamily: 'var(--font-b)',
+  fontSize: '0.88rem', outline: 'none', width: '100%',
+};
+
+const labelStyle = {
+  display: 'block', fontSize: '0.7rem', fontWeight: 500,
+  color: 'var(--text2)', letterSpacing: '0.1em',
+  textTransform: 'uppercase', marginBottom: '6px',
+};
+
+const sectionTitle = {
+  fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600,
+  letterSpacing: '0.04em', color: 'var(--text)',
+  borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '16px',
+};
+
+// Mapea la acción del resultado a un estado visual coherente con el tema oscuro
+const resolverEstadoVisual = (resultado) => {
+  if (!resultado) return null;
+  if (resultado.accion === 'bloqueado') {
+    return { titulo: 'BLOQUEO OPERATIVO', color: 'var(--red)', bg: 'var(--red-dim)', borde: 'rgba(255,59,48,0.35)' };
+  }
+  const accion = resultado.data?.accion;
+  if (accion === 'despachar_urgente') {
+    return { titulo: 'ALERTA · DESPACHO URGENTE', color: 'var(--red)', bg: 'var(--red-dim)', borde: 'rgba(255,59,48,0.35)' };
+  }
+  if (accion === 'esperar') {
+    return { titulo: 'MODO EFICIENCIA · ESPERAR', color: 'var(--amber)', bg: 'var(--amber-dim)', borde: 'rgba(255,184,0,0.35)' };
+  }
+  return { titulo: 'DESPACHO NORMAL', color: 'var(--green)', bg: 'var(--green-dim)', borde: 'rgba(0,230,118,0.35)' };
 };
 
 export default function OperacionPage() {
-  const [buses, setBuses] = useState([]);
+  const [buses, setBuses]         = useState([]);
   const [estaciones, setEstaciones] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]     = useState(true);
 
-  // Formulario
   const [busSel, setBusSel] = useState('');
   const [estSel, setEstSel] = useState('');
   const [ocupBus, setOcupBus] = useState(10);
   const [ocupEst, setOcupEst] = useState(150);
 
-  // Resultado
   const [resultado, setResultado] = useState(null);
-  const [ahorro, setAhorro] = useState(null);
+  const [ahorro, setAhorro]       = useState(null);
 
   useEffect(() => {
     const load = async () => {
-      const [resB, resE, resA] = await Promise.all([
-        api.get('/buses'),
-        api.get('/estaciones'),
-        api.get('/operacion/ahorro-combustible')
-      ]);
-      setBuses(resB.data.data);
-      setEstaciones(resE.data.data);
-      setAhorro(resA.data.data);
-      if (resB.data.data.length > 0) setBusSel(resB.data.data[0].id_bus);
-      if (resE.data.data.length > 0) setEstSel(resE.data.data[0].id_estacion);
-      setLoading(false);
+      try {
+        const [resB, resE, resA] = await Promise.all([
+          api.get('/buses'),
+          api.get('/estaciones'),
+          api.get('/operacion/ahorro-combustible'),
+        ]);
+        setBuses(resB.data.data);
+        setEstaciones(resE.data.data);
+        setAhorro(resA.data.data);
+        if (resB.data.data.length > 0) setBusSel(resB.data.data[0].id_bus);
+        if (resE.data.data.length > 0) setEstSel(resE.data.data[0].id_estacion);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);
@@ -54,166 +82,144 @@ export default function OperacionPage() {
     setResultado(null);
     try {
       const res = await api.post('/operacion/registro-estacion', {
-        id_bus: parseInt(busSel),
-        id_estacion: parseInt(estSel),
-        ocupacion_bus: parseInt(ocupBus),
-        ocupacion_estacion: parseInt(ocupEst)
+        id_bus:             parseInt(busSel),
+        id_estacion:        parseInt(estSel),
+        ocupacion_bus:      parseInt(ocupBus),
+        ocupacion_estacion: parseInt(ocupEst),
       });
       setResultado(res.data);
     } catch (err) {
-      if (err.response?.data) {
-        setResultado(err.response.data);
-      } else {
-        alert('Error de conexión');
-      }
+      if (err.response?.data) setResultado(err.response.data);
+      else alert('Error de conexión');
     }
   };
 
   if (loading) return <Loader />;
 
+  const estado = resolverEstadoVisual(resultado);
+
   return (
-    <div className="fade-up" style={{ minHeight: '100%', background: colors.blanco }}>
-      {/* Header Estilo "Centro de Mando" */}
-      <div style={{ background: colors.azulTecnologico, padding: '20px 30px', color: colors.blanco, display: 'flex', alignItems: 'center', gap: '20px' }}>
-        {/* Marcador de posición para Logo Solicitado */}
-        <div style={{ 
-          width: '60px', height: '60px', borderRadius: '50%', background: colors.blanco, 
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          border: `3px solid ${colors.verdeInstitucional}`, padding: '5px'
-        }}>
-          <div style={{ textAlign: 'center', lineHeight: '1.1' }}>
-            <span style={{ fontSize: '1.2rem' }}>🚌</span>
-            <div style={{ fontSize: '0.4rem', color: colors.azulTecnologico, fontWeight: 'bold' }}>DATOS</div>
+    <div className="fade-up">
+      <PageHeader
+        title="Centro de Mando · Operación"
+        subtitle="Registro de eventos y validación de reglas críticas (REQ-0001 · REQ-0005 · REQ-0006)"
+      />
+
+      <div style={{ padding: '20px 28px' }}>
+
+        {/* KPIs ambientales arriba (flota eléctrica BYD) */}
+        {ahorro && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+            <StatCard label="Buses eléctricos"      value={ahorro.buses_electricos}      accent="var(--green)" delay={1} />
+            <StatCard label="Km diarios eléctricos" value={ahorro.distancia_diaria_km}   accent="var(--cyan)"  delay={2} />
+            <StatCard label="Galones ahorrados/día" value={ahorro.galones_ahorrados_dia} accent="var(--green)" delay={3} sub="vs flota diésel" />
+            <StatCard label="CO₂ evitado kg/día"    value={ahorro.co2_evitado_kg_dia}    accent="var(--cyan)"  delay={4} sub="por flota BYD" />
           </div>
-        </div>
-        <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem', fontFamily: 'var(--font-d)', fontWeight: 700 }}>Centro de Mando Transmetro</h1>
-          <p style={{ margin: 0, fontSize: '0.85rem', color: colors.grisPlata }}>Registro de Operaciones y Validación de Reglas Críticas</p>
-        </div>
-      </div>
+        )}
 
-      <div style={{ padding: '20px 30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        
-        {/* Panel Izquierdo: Simulación de Llegada */}
-        <div style={{ background: '#F5F7FA', padding: '24px', borderRadius: '8px', border: `1px solid ${colors.grisPlata}` }}>
-          <h2 style={{ color: colors.azulTecnologico, fontSize: '1.1rem', marginBottom: '16px', borderBottom: `2px solid ${colors.verdeInstitucional}`, paddingBottom: '8px' }}>
-            Registro de Entrada/Salida de Bus
-          </h2>
-          
-          <form onSubmit={handleSimular} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <div>
-              <label style={{ display: 'block', color: '#333', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>Bus Operando</label>
-              <select 
-                value={busSel} onChange={e => setBusSel(e.target.value)} 
-                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #CCC' }}
-              >
-                {buses.map(b => (
-                  <option key={b.id_bus} value={b.id_bus}>{b.placa} ({b.parqueo ? `Parqueo: ${b.parqueo}` : 'SIN PARQUEO'})</option>
-                ))}
-              </select>
-            </div>
+        {/* Simulador */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
 
-            <div>
-              <label style={{ display: 'block', color: '#333', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>Estación de Llegada</label>
-              <select 
-                value={estSel} onChange={e => setEstSel(e.target.value)} 
-                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #CCC' }}
-              >
-                {estaciones.map(e => (
-                  <option key={e.id_estacion} value={e.id_estacion}>{e.nombre} (Cap Max: {e.capacidad_max})</option>
-                ))}
-              </select>
-            </div>
+          {/* Panel izquierdo: formulario */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px' }}>
+            <div style={sectionTitle}>Registro de entrada / salida de bus</div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', color: '#333', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>Pasajeros Actuales en Bus</label>
-                <input 
-                  type="number" value={ocupBus} onChange={e => setOcupBus(e.target.value)}
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #CCC' }}
-                />
+            <form onSubmit={handleSimular} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+              <div>
+                <label style={labelStyle}>Bus en operación</label>
+                <select value={busSel} onChange={e => setBusSel(e.target.value)} style={inputStyle}>
+                  {buses.map(b => (
+                    <option key={b.id_bus} value={b.id_bus}>
+                      {b.placa} {b.es_electrico ? '⚡' : ''} · {b.parqueo ? `Parqueo: ${b.parqueo}` : 'SIN PARQUEO'}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', color: '#333', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>Torniquetes (Tarjeta Ciudadana)</label>
-                <input 
-                  type="number" value={ocupEst} onChange={e => setOcupEst(e.target.value)}
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #CCC' }}
-                  title="Ingresos en torniquetes menos salidas"
-                />
+
+              <div>
+                <label style={labelStyle}>Estación de llegada</label>
+                <select value={estSel} onChange={e => setEstSel(e.target.value)} style={inputStyle}>
+                  {estaciones.map(e => (
+                    <option key={e.id_estacion} value={e.id_estacion}>{e.nombre} · cap. {e.capacidad_max}</option>
+                  ))}
+                </select>
               </div>
-            </div>
 
-            <button type="submit" style={{
-              background: colors.verdeInstitucional, color: colors.blanco, border: 'none', 
-              padding: '12px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px'
-            }}>
-              Evaluar Reglas y Registrar
-            </button>
-          </form>
-        </div>
-
-        {/* Panel Derecho: Resultado de Reglas */}
-        <div>
-          <h2 style={{ color: colors.azulTecnologico, fontSize: '1.1rem', marginBottom: '16px', borderBottom: `2px solid ${colors.verdeInstitucional}`, paddingBottom: '8px' }}>
-            Resolución del Sistema
-          </h2>
-
-          {resultado ? (
-            <div style={{ 
-              padding: '20px', borderRadius: '8px', color: '#FFF',
-              background: resultado.accion === 'bloqueado' ? '#FF3B30' : 
-                          resultado.data?.accion === 'despachar_urgente' ? '#E53935' : 
-                          resultado.data?.accion === 'esperar' ? '#FFB300' : colors.verdeInstitucional 
-            }}>
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
-                {resultado.accion === 'bloqueado' ? 'BLOQUEO OPERATIVO' : 
-                 resultado.data?.accion === 'despachar_urgente' ? 'ALERTA: DESPACHO URGENTE' : 
-                 resultado.data?.accion === 'esperar' ? 'MODO EFICIENCIA: ESPERAR' : 'DESPACHO NORMAL'}
-              </h3>
-              
-              <p style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
-                {resultado.mensaje || resultado.data?.justificacion}
-              </p>
-
-              {resultado.data && (
-                <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '4px', fontSize: '0.85rem' }}>
-                  <strong>Métricas Evaluadas:</strong>
-                  <ul style={{ margin: '5px 0 0 20px' }}>
-                    <li>Carga del Bus: {resultado.data.pctBus}%</li>
-                    <li>Saturación Estación: {resultado.data.pctEstacion}%</li>
-                  </ul>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={labelStyle}>Pasajeros en bus</label>
+                  <input type="number" min="0" value={ocupBus}
+                    onChange={e => setOcupBus(e.target.value)} style={inputStyle} />
                 </div>
-              )}
-            </div>
-          ) : (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#888', background: '#F5F7FA', borderRadius: '8px', border: '1px dashed #CCC' }}>
-              Llena el formulario para evaluar las reglas críticas de operación.
-            </div>
-          )}
+                <div style={{ flex: 1 }}>
+                  <label style={labelStyle}>Ocupación estación (torniquetes)</label>
+                  <input type="number" min="0" value={ocupEst}
+                    onChange={e => setOcupEst(e.target.value)} style={inputStyle}
+                    title="Ingresos en torniquetes (Tarjeta Ciudadana) menos salidas" />
+                </div>
+              </div>
 
-          {/* Reporte de Ahorro de Combustible */}
-          <div style={{ marginTop: '20px', background: '#F5F7FA', padding: '20px', borderRadius: '8px', border: `1px solid ${colors.grisPlata}` }}>
-            <h3 style={{ color: colors.azulTecnologico, margin: '0 0 15px 0', fontSize: '1rem' }}>
-              Impacto Ambiental
-            </h3>
-            {ahorro && (
-              <div style={{ display: 'flex', gap: '15px', justifyContent: 'space-between' }}>
-                <div style={{ flex: 1, background: colors.blanco, padding: '10px', borderRadius: '6px', textAlign: 'center', border: `1px solid ${colors.grisPlata}` }}>
-                  <div style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase' }}>Galones Ahorrados / Día</div>
-                  <div style={{ color: colors.verdeInstitucional, fontWeight: 'bold', fontSize: '1.4rem' }}>{ahorro.galones_ahorrados_dia}</div>
+              <div style={{ marginTop: '6px' }}>
+                <Btn type="submit">Evaluar reglas y registrar</Btn>
+              </div>
+            </form>
+          </div>
+
+          {/* Panel derecho: resultado */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px' }}>
+            <div style={sectionTitle}>Resolución del sistema</div>
+
+            {!resultado ? (
+              <div style={{
+                padding: '36px', textAlign: 'center',
+                color: 'var(--text3)', fontSize: '0.88rem',
+                background: 'var(--bg3)', borderRadius: 'var(--r)',
+                border: '1px dashed var(--border2)',
+              }}>
+                Completa el formulario para evaluar las reglas críticas de operación.
+              </div>
+            ) : (
+              <div className="fade-up" style={{
+                padding: '18px',
+                borderRadius: 'var(--r2)',
+                background: estado.bg,
+                border: `1px solid ${estado.borde}`,
+                borderLeft: `3px solid ${estado.color}`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Badge color={estado.color}>{estado.titulo}</Badge>
                 </div>
-                <div style={{ flex: 1, background: colors.blanco, padding: '10px', borderRadius: '6px', textAlign: 'center', border: `1px solid ${colors.grisPlata}` }}>
-                  <div style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase' }}>CO2 Evitado (Kg/Día)</div>
-                  <div style={{ color: colors.azulTecnologico, fontWeight: 'bold', fontSize: '1.4rem' }}>{ahorro.co2_evitado_kg_dia}</div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text)', lineHeight: 1.5 }}>
+                  {resultado.mensaje || resultado.data?.justificacion}
                 </div>
+                {resultado.data && (
+                  <div style={{
+                    marginTop: '14px', padding: '10px 12px',
+                    background: 'var(--surface2)', borderRadius: 'var(--r)', fontSize: '0.83rem',
+                  }}>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
+                      Métricas evaluadas
+                    </div>
+                    <div style={{ display: 'flex', gap: '18px', color: 'var(--text)' }}>
+                      <span>Carga del bus: <strong style={{ color: estado.color }}>{resultado.data.pctBus}%</strong></span>
+                      <span>Saturación estación: <strong style={{ color: estado.color }}>{resultado.data.pctEstacion}%</strong></span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-            <p style={{ fontSize: '0.7rem', color: '#888', marginTop: '10px', textAlign: 'center' }}>
-              Cálculo basado en distancia digital de flota eléctrica BYD
-            </p>
-          </div>
-        </div>
 
+            <div style={{
+              marginTop: '14px', fontSize: '0.72rem', color: 'var(--text3)',
+              padding: '10px 12px', background: 'var(--bg3)', borderRadius: 'var(--r)',
+              borderLeft: '2px solid var(--border2)',
+            }}>
+              <strong style={{ color: 'var(--text2)' }}>Jerarquía aplicada:</strong> REQ-0005 (saturación ≥50%) anula a REQ-0006 (espera por baja carga &lt;25%) cuando ambos se activan a la vez.
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );

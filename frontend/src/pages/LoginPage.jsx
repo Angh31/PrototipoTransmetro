@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const S = {
@@ -106,7 +106,7 @@ export default function LoginPage() {
       <div style={S.card}>
 
         <div style={S.logoRow}>
-          <img src="/LogoT.png" alt="Transmetro" style={S.logoImg}
+          <img src="/logo-transmetro.png" alt="Transmetro" style={S.logoImg}
             onError={e => { e.target.style.display='none'; }} />
           <div>
             <div style={S.logoTitle}>TRANSMETRO</div>
@@ -143,6 +143,18 @@ export default function LoginPage() {
             {loading ? 'Verificando...' : 'Ingresar al sistema'}
           </button>
         </form>
+
+        <div style={{ marginTop: '1.6rem', textAlign: 'center' }}>
+          <Link to="/publico" style={{
+            display: 'inline-block', fontFamily: 'var(--font-d)', fontSize: '0.75rem',
+            fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+            color: 'var(--cyan)', textDecoration: 'none',
+            border: '1px solid var(--cyan2)', borderRadius: 'var(--r)',
+            padding: '7px 16px',
+          }}>
+            Ver información pública
+          </Link>
+        </div>
 
         <div style={S.footer}>
           Sistema de Control Integral · Municipalidad de Guatemala · 2026

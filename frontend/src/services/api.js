@@ -22,15 +22,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Manejo global de errores de autenticación
+// Manejo global de errores
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Evitar bucle: no redirigir si ya estamos en una ruta de auth
     const isAuthRoute = error.config?.url?.includes('/auth/');
-    if (error.response?.status === 401 && !isAuthRoute) {
+    const status      = error.response?.status;
+    const msg         = error.response?.data?.message;
+
+    if (status === 401 && !isAuthRoute) {
+      // Sesión expirada → fuera al login
       localStorage.removeItem('transmetro_token');
       window.location.href = '/login';
+    } else if (status === 403) {
+      // Sin permisos → toast claro al usuario
+      window.dispatchEvent(new CustomEvent('app:toast', {
+        detail: {
+          message: msg || 'No tienes permisos para realizar esta acción',
+          kind:    'error',
+        },
+      }));
     }
     return Promise.reject(error);
   }

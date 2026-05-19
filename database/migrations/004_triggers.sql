@@ -25,6 +25,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_validar_parqueo_electrico ON buses;
 CREATE TRIGGER trg_validar_parqueo_electrico
   BEFORE INSERT OR UPDATE OF id_parqueo, es_electrico ON buses
   FOR EACH ROW EXECUTE FUNCTION fn_validar_parqueo_electrico();
@@ -43,6 +44,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_bus_sin_parqueo ON buses;
 CREATE TRIGGER trg_bus_sin_parqueo
   BEFORE UPDATE OF id_parqueo ON buses
   FOR EACH ROW EXECUTE FUNCTION fn_bus_sin_parqueo();
@@ -83,6 +85,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_validar_flota_linea ON buses;
 CREATE TRIGGER trg_validar_flota_linea
   BEFORE INSERT OR UPDATE OF id_linea ON buses
   FOR EACH ROW EXECUTE FUNCTION fn_validar_flota_linea();
@@ -111,6 +114,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_acceso_sin_guardia ON guardia_acceso;
 CREATE TRIGGER trg_acceso_sin_guardia
   BEFORE UPDATE OF activo ON guardia_acceso
   FOR EACH ROW EXECUTE FUNCTION fn_acceso_sin_guardia();

@@ -15,7 +15,9 @@ const busesRoutes      = require('./buses.routes');
 const pilotosRoutes    = require('./pilotos.routes');
 const alertasRoutes    = require('./alertas.routes');
 const municipiosRoutes = require('./municipios.routes');
+const parqueosRoutes   = require('./parqueos.routes');
 const operacionRoutes  = require('./operacion.routes');
+const publicoRoutes    = require('./publico.routes');
 
 const router = Router();
 
@@ -38,6 +40,8 @@ router.use('/buses',       busesRoutes);
 router.use('/pilotos',     pilotosRoutes);
 router.use('/alertas',     alertasRoutes);
 router.use('/municipios',  municipiosRoutes);
+router.use('/parqueos',    parqueosRoutes);
 router.use('/operacion',   operacionRoutes);
+router.use('/publico',     publicoRoutes);
 
 module.exports = router;

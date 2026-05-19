@@ -31,17 +31,12 @@ export default function BusesPage() {
 
   const load = () => {
     api.get('/buses').then(r => setRows(r.data.data)).finally(() => setLoading(false));
-    api.get('/api/municipios').then(() => {}); // Hack to trigger auth or something if needed, but let's just fetch lineas and parqueos ideally. Actually let's assume they are fetched or just use a simple form with text inputs for now if not fetched.
   };
-  
-  // To keep it simple, I will fetch lineas and parqueos when opening the form.
+
   const handleOpenForm = async () => {
     setShowForm(true);
-    // Since we don't have dedicated endpoints imported here yet, we'll assume we can fetch them.
-    // Wait, the API routes are `/lineas` and `/parqueos` (maybe not exposed).
-    // Let's check what's available or just use raw text inputs for simplicity.
-    // Actually, I can fetch lineas from /lineas. For parqueos, maybe I have to hardcode or fetch.
     api.get('/lineas').then(r => setLineas(r.data.data)).catch(()=>{});
+    api.get('/parqueos').then(r => setParqueos(r.data.data)).catch(()=>{});
   };
 
   const handleSave = async (e) => {
@@ -168,9 +163,9 @@ export default function BusesPage() {
 
               <select required value={formData.id_parqueo} onChange={e => setFormData({ ...formData, id_parqueo: e.target.value })} style={{ padding: '8px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--r)' }}>
                 <option value="">-- Seleccionar Parqueo Obligatorio --</option>
-                <option value="1">Centra Sur</option>
-                <option value="2">Centra Norte</option>
-                <option value="3">Parqueo L5 (Carga Eléctrica)</option>
+                {parqueos.map(p => (
+                  <option key={p.id_parqueo} value={p.id_parqueo}>{p.nombre}{p.carga_electrica ? ' ⚡' : ''}</option>
+                ))}
               </select>
 
               <select value={formData.id_linea} onChange={e => setFormData({ ...formData, id_linea: e.target.value })} style={{ padding: '8px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--r)' }}>
