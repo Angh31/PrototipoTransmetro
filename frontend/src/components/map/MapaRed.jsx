@@ -29,7 +29,7 @@ const LINE_COLORS = {
 
 const colorLinea = (codigo) => LINE_COLORS[codigo] || '#00D4FF';
 
-export default function MapaRed({ estaciones = [], recorridos = [], alto = 460, tileVariant = 'dark' }) {
+export default function MapaRed({ estaciones = [], recorridos = [], alto = 460 }) {
   // Filtrar estaciones con coordenadas válidas
   const puntos = useMemo(
     () => estaciones.filter(e => e.lat != null && e.lng != null),
@@ -46,14 +46,6 @@ export default function MapaRed({ estaciones = [], recorridos = [], alto = 460, 
       }))
       .filter(r => r.coords.length >= 2);
   }, [recorridos]);
-
-  const tileUrl = tileVariant === 'dark'
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-  const tileAttribution = tileVariant === 'dark'
-    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
   if (puntos.length === 0) {
     return (
@@ -72,11 +64,25 @@ export default function MapaRed({ estaciones = [], recorridos = [], alto = 460, 
       <MapContainer center={GT_CENTER} zoom={GT_ZOOM} scrollWheelZoom style={{ height: '100%', width: '100%', background: 'var(--bg2)' }}>
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name="Mapa oscuro">
-            <TileLayer attribution={tileAttribution} url='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' />
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' />
           </LayersControl.BaseLayer>
           <LayersControl.BaseLayer name="OpenStreetMap">
-            <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
           </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Satélite">
+            <TileLayer
+              attribution='Imágenes &copy; <a href="https://www.esri.com">Esri</a>'
+              url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' />
+          </LayersControl.BaseLayer>
+          <LayersControl.Overlay name="Etiquetas (calles y lugares)">
+            <TileLayer
+              attribution='Etiquetas &copy; <a href="https://www.esri.com">Esri</a>'
+              url='https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}' />
+          </LayersControl.Overlay>
         </LayersControl>
 
         {/* Polilíneas por línea */}

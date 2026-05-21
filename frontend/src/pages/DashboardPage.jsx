@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import api from '../services/api';
 import { conectarSocket } from '../services/socket';
-import { PageHeader, StatCard, Badge, AlertDot, Loader } from '../components/ui';
+import { PageHeader, StatCard, Badge, AlertDot, Loader, Btn } from '../components/ui';
 import MapaRed from '../components/map/MapaRed';
 
 const CustomTooltip = ({ active, payload }) => {
@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [alertas, setAlertas]   = useState([]);
   const [liveAlert, setLiveAlert] = useState(null);
   const [red, setRed]           = useState(null); // estaciones geolocalizadas + recorridos para el mapa
+  const [mostrarMapa, setMostrarMapa] = useState(false);
 
   const load = async () => {
     try {
@@ -102,17 +103,26 @@ export default function DashboardPage() {
             sub={`${data?.alertas?.alta} alta · ${data?.alertas?.critica} crítica`} />
         </div>
 
-        {/* Mapa interactivo de la red */}
+        {/* Mapa interactivo de la red (colapsable) */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
-              Mapa de la red
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: mostrarMapa ? '14px' : '0' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+              <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
+                Mapa de la red
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>
+                {red?.estaciones?.filter(e => e.lat).length || 0} estaciones · {red?.recorridos?.length || 0} líneas trazadas
+              </span>
             </div>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>
-              OpenStreetMap · {red?.estaciones?.filter(e => e.lat).length || 0} estaciones · {red?.recorridos?.length || 0} líneas trazadas
-            </span>
+            <Btn small ghost onClick={() => setMostrarMapa(v => !v)}>
+              {mostrarMapa ? 'Ocultar mapa' : 'Mostrar mapa de la red'}
+            </Btn>
           </div>
-          <MapaRed estaciones={red?.estaciones || []} recorridos={red?.recorridos || []} alto={420} />
+          {mostrarMapa && (
+            <div className="fade-up">
+              <MapaRed estaciones={red?.estaciones || []} recorridos={red?.recorridos || []} alto={420} />
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px' }}>

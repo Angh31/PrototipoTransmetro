@@ -1,0 +1,74 @@
+@startuml
+!theme plain
+title Diagrama Entidad-Relación: Sistema de Control Integral Transmetro
+
+entity "Piloto" as piloto {
+  * id_piloto : SERIAL <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * historial_educativo : TEXT -- REQ-0002
+  * direccion : VARCHAR(200)
+  * contacto : VARCHAR(50)
+}
+
+entity "Parqueo" as parqueo {
+  * id_parqueo : SERIAL <<PK>>
+  --
+  * ubicacion : VARCHAR(100)
+  * tipo_infraestructura : VARCHAR(50) -- Normal / Eléctrica (L5)
+  * disponible : BOOLEAN
+}
+
+entity "Bus" as bus {
+  * id_bus : SERIAL <<PK>>
+  --
+  * placa : VARCHAR(15) <<UNIQUE>>
+  * capacidad_pasajeros : INT
+  * ocupacion_actual : INT
+  * id_parqueo : INT <<FK>> -- Relación 1:1 Obligatoria (REQ-0001)
+  * id_linea : INT <<FK>>
+  * id_piloto : INT <<FK>>
+}
+
+entity "Estacion" as estacion {
+  * id_estacion : SERIAL <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * capacidad_maxima : INT
+  * ocupacion_actual : INT -- Base para Alerta 50%
+  * id_linea : INT <<FK>>
+}
+
+entity "Linea" as linea {
+  * id_linea : SERIAL <<PK>>
+  --
+  * nombre_color : VARCHAR(50)
+  * longitud_total_km : FLOAT -- REQ-0004
+}
+
+entity "Acceso" as acceso {
+  * id_acceso : SERIAL <<PK>>
+  --
+  * id_estacion : INT <<FK>>
+  * descripcion : VARCHAR(100)
+}
+
+entity "Usuario" as usuario {
+  * id_usuario : SERIAL <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * rol : VARCHAR(20) -- Operador, Supervisor, Admin, Guardia
+  * email : VARCHAR(100) <<UNIQUE>>
+  * password_hash : VARCHAR(255)
+  o id_estacion : INT <<FK>> -- NULL para Admin/Supervisor
+}
+
+' Relaciones
+linea ||--o{ bus : "asigna flota"
+linea ||--|{ estacion : "compuesta por"
+bus |o--|| parqueo : "asignación obligatoria"
+bus ||--|| piloto : "conducido por"
+estacion ||--|{ acceso : "posee"
+usuario }o--o| estacion : "opera (rol Operador)"
+
+@enduml

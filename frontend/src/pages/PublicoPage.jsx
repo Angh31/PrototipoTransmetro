@@ -34,6 +34,7 @@ export default function PublicoPage() {
   const [lineaSel, setLineaSel] = useState(null);
   const [detalle, setDetalle]   = useState(null);
   const [clock, setClock]     = useState('');
+  const [mapaModal, setMapaModal] = useState(false);
 
   const cargar = () => {
     api.get('/publico/red')
@@ -121,15 +122,24 @@ export default function PublicoPage() {
           <Stat label="Alertas activas"     value={data?.metricas?.alertas_activas}    accent={data?.metricas?.alertas_activas > 0 ? 'var(--red)' : 'var(--green)'} />
         </div>
 
-        {/* Mapa interactivo de la red */}
+        {/* Mapa interactivo de la red (compacto + botón ampliar) */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
-              Mapa de la red
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+              <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
+                Mapa de la red
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>{data?.estaciones?.filter(e => e.lat).length || 0} estaciones geolocalizadas</span>
             </div>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>OpenStreetMap · {data?.estaciones?.filter(e => e.lat).length || 0} estaciones geolocalizadas</span>
+            <button onClick={() => setMapaModal(true)} style={{
+              fontFamily: 'var(--font-d)', fontSize: '0.74rem', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--cyan)', background: 'var(--surface2)',
+              border: '1px solid var(--cyan2)', borderRadius: 'var(--r)',
+              padding: '6px 14px', cursor: 'pointer',
+            }}>↗ Ampliar mapa</button>
           </div>
-          <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto={460} />
+          <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto={320} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: lineaSel ? '1fr 380px' : '1fr', gap: '16px' }}>
@@ -258,6 +268,30 @@ export default function PublicoPage() {
           Sistema de Control Integral Transmetro · Municipalidad de Guatemala · 2026 · @author Anghel CC
         </footer>
       </div>
+
+      {/* Modal: mapa a pantalla grande */}
+      {mapaModal && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)',
+          zIndex: 1000, display: 'flex', flexDirection: 'column', padding: '24px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <div style={{ fontFamily: 'var(--font-d)', fontSize: '1.2rem', fontWeight: 700, color: 'var(--cyan)', letterSpacing: '0.03em' }}>
+              Mapa de la red Transmetro
+            </div>
+            <button onClick={() => setMapaModal(false)} style={{
+              fontFamily: 'var(--font-d)', fontSize: '0.8rem', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--text2)', background: 'var(--surface2)',
+              border: '1px solid var(--border)', borderRadius: 'var(--r)',
+              padding: '8px 16px', cursor: 'pointer',
+            }}>✕ Cerrar</button>
+          </div>
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto="100%" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
