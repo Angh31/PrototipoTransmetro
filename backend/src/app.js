@@ -10,6 +10,7 @@ require('dotenv').config();
 const express    = require('express');
 const http       = require('http');
 const cors       = require('cors');
+const helmet     = require('helmet');
 const { Server } = require('socket.io');
 
 const { testConnection }           = require('./config/db');
@@ -33,6 +34,7 @@ const io = new Server(server, {
 app.set('io', io);
 
 // ─── Middlewares globales ─────────────────────────────────────────────────────
+app.use(helmet({ crossOriginResourcePolicy: false })); // cabeceras de seguridad HTTP
 app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

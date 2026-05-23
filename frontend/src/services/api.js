@@ -22,26 +22,30 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Manejo global de errores
+// Manejo global de errores con notificaciones internas (toast)
+const toast = (message, kind = 'error') =>
+  window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, kind } }));
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isAuthRoute = error.config?.url?.includes('/auth/');
-    const status      = error.response?.status;
-    const msg         = error.response?.data?.message;
+    const url    = error.config?.url || '';
+    const status = error.response?.status;
+    const msg    = error.response?.data?.message;
 
-    if (status === 401 && !isAuthRoute) {
+    // Estas rutas manejan el error en su propia UI (mensaje inline / panel de resolución)
+    const manejaErrorPropio = url.includes('/auth/login') || url.includes('/operacion/registro-estacion');
+
+    if (status === 401 && !url.includes('/auth/')) {
       // Sesión expirada → fuera al login
       localStorage.removeItem('transmetro_token');
       window.location.href = '/login';
-    } else if (status === 403) {
-      // Sin permisos → toast claro al usuario
-      window.dispatchEvent(new CustomEvent('app:toast', {
-        detail: {
-          message: msg || 'No tienes permisos para realizar esta acción',
-          kind:    'error',
-        },
-      }));
+    } else if (!manejaErrorPropio) {
+      if ([400, 403, 409].includes(status)) {
+        toast(msg || 'No se pudo completar la acción', 'error');
+      } else if (!error.response) {
+        toast('Error de conexión con el servidor', 'error');
+      }
     }
     return Promise.reject(error);
   }

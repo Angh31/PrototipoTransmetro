@@ -170,6 +170,55 @@ export const AlertDot = ({ nivel }) => {
   );
 };
 
+// ── MedidorPassword ─────────────────────────────────────────────────────────────
+// Indicador visual de fuerza de contraseña + checklist de requisitos.
+// Política: 8+ caracteres, mayúscula, minúscula, número (símbolo recomendado).
+export const evaluarPassword = (pwd = '') => {
+  const checks = {
+    longitud:  pwd.length >= 8,
+    mayuscula: /[A-Z]/.test(pwd),
+    minuscula: /[a-z]/.test(pwd),
+    numero:    /[0-9]/.test(pwd),
+    simbolo:   /[^A-Za-z0-9]/.test(pwd),
+  };
+  const cumplidos = Object.values(checks).filter(Boolean).length;
+  // Requisitos obligatorios: longitud, mayúscula, minúscula, número
+  const valida = checks.longitud && checks.mayuscula && checks.minuscula && checks.numero;
+  return { checks, cumplidos, valida };
+};
+
+export const MedidorPassword = ({ password = '' }) => {
+  if (!password) return null;
+  const { checks, cumplidos } = evaluarPassword(password);
+  const niveles  = ['Muy débil', 'Débil', 'Aceptable', 'Buena', 'Fuerte'];
+  const colores  = ['var(--red)', 'var(--red)', 'var(--amber)', 'var(--cyan)', 'var(--green)'];
+  const idx = Math.max(0, cumplidos - 1);
+  const req = [
+    ['8+ caracteres', checks.longitud],
+    ['Mayúscula',     checks.mayuscula],
+    ['Minúscula',     checks.minuscula],
+    ['Número',        checks.numero],
+    ['Símbolo (recomendado)', checks.simbolo],
+  ];
+  return (
+    <div style={{ fontSize: '0.7rem', marginTop: '-4px' }}>
+      <div style={{ display: 'flex', gap: '3px', marginBottom: '6px' }}>
+        {[0, 1, 2, 3, 4].map(i => (
+          <div key={i} style={{ flex: 1, height: '4px', borderRadius: '2px', background: i < cumplidos ? colores[idx] : 'var(--border2)', transition: 'background 0.2s' }} />
+        ))}
+      </div>
+      <div style={{ color: colores[idx], marginBottom: '5px', fontFamily: 'var(--font-d)', letterSpacing: '0.04em' }}>{niveles[idx]}</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 12px' }}>
+        {req.map(([label, ok]) => (
+          <span key={label} style={{ color: ok ? 'var(--green)' : 'var(--text3)' }}>
+            {ok ? '✓' : '○'} {label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 // Sistema global de avisos. Disparar con:
 //   window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, kind } }))

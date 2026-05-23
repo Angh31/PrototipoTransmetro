@@ -11,6 +11,13 @@ import { conectarSocket } from '../services/socket';
 import { PageHeader, StatCard, Badge, AlertDot, Loader, Btn } from '../components/ui';
 import MapaRed from '../components/map/MapaRed';
 
+// Colores por línea (consistentes con el mapa de la red)
+const LINE_COLORS = {
+  L1: '#FF3B30', L2: '#FF9500', L5: '#00E676', L6: '#FFB800', L7: '#00D4FF',
+  L12: '#9C27B0', L13: '#E91E63', L18: '#3F51B5', TB1: '#607D8B', TB2: '#9E9E9E',
+};
+const colorLinea = (codigo) => LINE_COLORS[codigo] || 'var(--cyan2)';
+
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -139,7 +146,7 @@ export default function DashboardPage() {
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,212,255,0.05)' }} />
                 <Bar dataKey="buses_asignados" radius={[4,4,0,0]}>
                   {flota.map((entry, i) => (
-                    <Cell key={i} fill={parseInt(entry.buses_asignados) > 0 ? 'var(--cyan2)' : 'var(--border2)'} />
+                    <Cell key={i} fill={parseInt(entry.buses_asignados) > 0 ? colorLinea(entry.codigo) : 'var(--border2)'} />
                   ))}
                 </Bar>
               </BarChart>

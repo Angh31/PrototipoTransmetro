@@ -6,6 +6,7 @@
  */
 
 const { pool } = require('../config/db');
+const { registrarAuditoria } = require('../utils/auditoria');
 
 // GET /api/alertas
 const getAlertas = async (req, res, next) => {
@@ -60,6 +61,8 @@ const cerrarAlerta = async (req, res, next) => {
     // Notificar resolución por socket
     const io = req.app.get('io');
     io.to('dashboard').emit('alerta:resuelta', { id_alerta: rows[0].id_alerta });
+
+    await registrarAuditoria(req.user?.username, 'ALERTA_RESUELTA', `Alerta #${rows[0].id_alerta} (${rows[0].tipo})`);
 
     res.json({ ok: true, data: rows[0] });
   } catch (err) { next(err); }

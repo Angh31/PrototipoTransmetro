@@ -96,7 +96,7 @@ export default function LineasPage() {
         }
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al guardar');
+      /* la notificación la muestra el interceptor de api.js */
     }
   };
 

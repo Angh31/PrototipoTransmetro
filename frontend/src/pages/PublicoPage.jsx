@@ -12,6 +12,34 @@ import MapaRed from '../components/map/MapaRed';
 
 const NIVEL_COLOR = { critica: 'var(--red)', alta: 'var(--red)', media: 'var(--amber)', baja: 'var(--green)' };
 
+// Traducciones de la vista pública (idiomas más frecuentes entre visitantes en Guatemala)
+const T = {
+  es: {
+    subHeader: 'Información Pública · Pasajeros', enVivo: 'En vivo', acceso: 'Acceso al Sistema',
+    titulo: 'Red Transmetro Guatemala',
+    subtitulo: 'Consulta de líneas, estaciones y alertas activas del servicio en tiempo real.',
+    lineasActivas: 'Líneas activas', estaciones: 'Estaciones', busesServicio: 'Buses en servicio', alertasActivas: 'Alertas activas',
+    lineasDisponibles: 'Líneas disponibles', paradas: 'paradas', buses: 'buses',
+    distancia: 'Distancia', paradasCol: 'Paradas', busesCol: 'Buses', municipio: 'Municipio',
+    recorrido: 'Recorrido', cargando: 'Cargando…',
+    mapaRed: 'Mapa de la red', estacionesGeo: 'estaciones geolocalizadas', ampliar: '↗ Ampliar mapa', verMapa: '🗺 Ver mapa',
+    avisos: 'Avisos al público', sinAvisos: '✓ Sin avisos por el momento',
+    mapaTitulo: 'Mapa de la red Transmetro', cerrar: '✕ Cerrar', cargandoPublica: 'Cargando información pública...',
+  },
+  en: {
+    subHeader: 'Public Information · Passengers', enVivo: 'Live', acceso: 'System Access',
+    titulo: 'Transmetro Network · Guatemala',
+    subtitulo: 'Check lines, stations and active service alerts in real time.',
+    lineasActivas: 'Active lines', estaciones: 'Stations', busesServicio: 'Buses in service', alertasActivas: 'Active alerts',
+    lineasDisponibles: 'Available lines', paradas: 'stops', buses: 'buses',
+    distancia: 'Distance', paradasCol: 'Stops', busesCol: 'Buses', municipio: 'Municipality',
+    recorrido: 'Route', cargando: 'Loading…',
+    mapaRed: 'Network map', estacionesGeo: 'geolocated stations', ampliar: '↗ Expand map', verMapa: '🗺 View map',
+    avisos: 'Public notices', sinAvisos: '✓ No notices at the moment',
+    mapaTitulo: 'Transmetro network map', cerrar: '✕ Close', cargandoPublica: 'Loading public information...',
+  },
+};
+
 const Stat = ({ label, value, accent = 'var(--cyan)' }) => (
   <div style={{
     background: 'var(--surface)', border: '1px solid var(--border)',
@@ -35,6 +63,10 @@ export default function PublicoPage() {
   const [detalle, setDetalle]   = useState(null);
   const [clock, setClock]     = useState('');
   const [mapaModal, setMapaModal] = useState(false);
+  const [idioma, setIdioma]   = useState(() => localStorage.getItem('transmetro_idioma') || 'es');
+  const t = T[idioma] || T.es;
+
+  const cambiarIdioma = (lang) => { setIdioma(lang); localStorage.setItem('transmetro_idioma', lang); };
 
   const cargar = () => {
     api.get('/publico/red')
@@ -66,7 +98,7 @@ export default function PublicoPage() {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', gap: '10px' }}>
         <div style={{ width: '18px', height: '18px', border: '2px solid var(--border2)', borderTopColor: 'var(--cyan)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-        Cargando información pública...
+        {t.cargandoPublica}
       </div>
     );
   }
@@ -86,20 +118,37 @@ export default function PublicoPage() {
             onError={e => e.target.style.display='none'} />
           <div>
             <div style={{ fontFamily: 'var(--font-d)', fontWeight: 700, fontSize: '1.05rem', color: 'var(--cyan)', letterSpacing: '0.04em' }}>TRANSMETRO</div>
-            <div style={{ fontSize: '0.66rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Información Pública · Pasajeros</div>
+            <div style={{ fontSize: '0.66rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{t.subHeader}</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Selector de idioma */}
+          <div style={{ display: 'flex', border: '1px solid var(--border2)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
+            {['es', 'en'].map(lang => (
+              <button key={lang} onClick={() => cambiarIdioma(lang)} style={{
+                padding: '5px 10px', border: 'none', cursor: 'pointer',
+                fontFamily: 'var(--font-d)', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.06em',
+                background: idioma === lang ? 'var(--cyan)' : 'transparent',
+                color: idioma === lang ? '#030810' : 'var(--text3)',
+              }}>{lang.toUpperCase()}</button>
+            ))}
+          </div>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--green)', fontSize: '0.75rem' }}>
             <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--green)', boxShadow: '0 0 6px var(--green)' }} />
-            En vivo · {clock}
+            {t.enVivo} · {clock}
           </span>
+          <button onClick={() => setMapaModal(true)} style={{
+            fontFamily: 'var(--font-d)', fontSize: '0.78rem', fontWeight: 600,
+            letterSpacing: '0.06em', textTransform: 'uppercase',
+            color: '#030810', background: 'var(--cyan)', border: 'none',
+            borderRadius: 'var(--r)', padding: '6px 14px', cursor: 'pointer',
+          }}>{t.verMapa}</button>
           <Link to="/login" style={{
             fontFamily: 'var(--font-d)', fontSize: '0.78rem', fontWeight: 600,
             letterSpacing: '0.06em', textTransform: 'uppercase',
             color: 'var(--cyan)', textDecoration: 'none',
             border: '1px solid var(--cyan2)', borderRadius: 'var(--r)', padding: '6px 14px',
-          }}>Acceso al Sistema</Link>
+          }}>{t.acceso}</Link>
         </div>
       </header>
 
@@ -107,39 +156,19 @@ export default function PublicoPage() {
 
         <div style={{ marginBottom: '24px' }}>
           <h1 style={{ fontFamily: 'var(--font-d)', fontSize: '1.7rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '0.03em' }}>
-            Red Transmetro Guatemala
+            {t.titulo}
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text2)', marginTop: '4px' }}>
-            Consulta de líneas, estaciones y alertas activas del servicio en tiempo real.
+            {t.subtitulo}
           </p>
         </div>
 
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-          <Stat label="Líneas activas"     value={data?.metricas?.lineas}             accent="var(--cyan)" />
-          <Stat label="Estaciones"          value={data?.metricas?.estaciones}         accent="var(--cyan)" />
-          <Stat label="Buses en servicio"   value={data?.metricas?.buses_en_servicio}  accent="var(--green)" />
-          <Stat label="Alertas activas"     value={data?.metricas?.alertas_activas}    accent={data?.metricas?.alertas_activas > 0 ? 'var(--red)' : 'var(--green)'} />
-        </div>
-
-        {/* Mapa interactivo de la red (compacto + botón ampliar) */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-              <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
-                Mapa de la red
-              </div>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>{data?.estaciones?.filter(e => e.lat).length || 0} estaciones geolocalizadas</span>
-            </div>
-            <button onClick={() => setMapaModal(true)} style={{
-              fontFamily: 'var(--font-d)', fontSize: '0.74rem', fontWeight: 600,
-              letterSpacing: '0.06em', textTransform: 'uppercase',
-              color: 'var(--cyan)', background: 'var(--surface2)',
-              border: '1px solid var(--cyan2)', borderRadius: 'var(--r)',
-              padding: '6px 14px', cursor: 'pointer',
-            }}>↗ Ampliar mapa</button>
-          </div>
-          <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto={320} />
+          <Stat label={t.lineasActivas}    value={data?.metricas?.lineas}             accent="var(--cyan)" />
+          <Stat label={t.estaciones}        value={data?.metricas?.estaciones}         accent="var(--cyan)" />
+          <Stat label={t.busesServicio}     value={data?.metricas?.buses_en_servicio}  accent="var(--green)" />
+          <Stat label={t.alertasActivas}    value={data?.metricas?.alertas_activas}    accent={data?.metricas?.alertas_activas > 0 ? 'var(--red)' : 'var(--green)'} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: lineaSel ? '1fr 380px' : '1fr', gap: '16px' }}>
@@ -147,7 +176,7 @@ export default function PublicoPage() {
           {/* Lista de líneas */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px' }}>
             <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', marginBottom: '14px', color: 'var(--text)' }}>
-              Líneas disponibles
+              {t.lineasDisponibles}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
               {data?.lineas?.map(l => (
@@ -164,8 +193,8 @@ export default function PublicoPage() {
                   </div>
                   <div style={{ fontSize: '0.83rem', color: 'var(--text)', marginBottom: '6px' }}>{l.nombre}</div>
                   <div style={{ display: 'flex', gap: '12px', fontSize: '0.7rem', color: 'var(--text3)' }}>
-                    <span>{l.total_estaciones} paradas</span>
-                    <span>{l.total_buses} buses</span>
+                    <span>{l.total_estaciones} {t.paradas}</span>
+                    <span>{l.total_buses} {t.buses}</span>
                     <span>{l.municipio}</span>
                   </div>
                 </button>
@@ -186,15 +215,15 @@ export default function PublicoPage() {
               </div>
 
               {!detalle ? (
-                <div style={{ color: 'var(--text3)', fontSize: '0.85rem', textAlign: 'center', padding: '20px 0' }}>Cargando…</div>
+                <div style={{ color: 'var(--text3)', fontSize: '0.85rem', textAlign: 'center', padding: '20px 0' }}>{t.cargando}</div>
               ) : (
                 <>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
                     {[
-                      ['Distancia', detalle.distancia_km ? `${detalle.distancia_km} km` : '—'],
-                      ['Paradas',   detalle.estaciones.length],
-                      ['Buses',     detalle.total_buses],
-                      ['Municipio', detalle.municipio],
+                      [t.distancia, detalle.distancia_km ? `${detalle.distancia_km} km` : '—'],
+                      [t.paradasCol, detalle.estaciones.length],
+                      [t.busesCol,   detalle.total_buses],
+                      [t.municipio,  detalle.municipio],
                     ].map(([k, v]) => (
                       <div key={k} style={{ background: 'var(--bg3)', borderRadius: 'var(--r)', padding: '9px 11px' }}>
                         <div style={{ fontSize: '0.67rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{k}</div>
@@ -205,7 +234,7 @@ export default function PublicoPage() {
 
                   {detalle.estaciones.length > 0 && (
                     <>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Recorrido</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>{t.recorrido}</div>
                       <div style={{ maxHeight: '320px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {detalle.estaciones.map((e, i) => (
                           <div key={e.id_estacion} style={{
@@ -226,14 +255,34 @@ export default function PublicoPage() {
           )}
         </div>
 
+        {/* Mapa interactivo de la red (compacto + botón ampliar) */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginTop: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+              <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
+                {t.mapaRed}
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>{data?.estaciones?.filter(e => e.lat).length || 0} {t.estacionesGeo}</span>
+            </div>
+            <button onClick={() => setMapaModal(true)} style={{
+              fontFamily: 'var(--font-d)', fontSize: '0.74rem', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--cyan)', background: 'var(--surface2)',
+              border: '1px solid var(--cyan2)', borderRadius: 'var(--r)',
+              padding: '6px 14px', cursor: 'pointer',
+            }}>{t.ampliar}</button>
+          </div>
+          <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto={320} />
+        </div>
+
         {/* Alertas activas (avisos al público) */}
         <div style={{ marginTop: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px' }}>
           <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', marginBottom: '14px', color: 'var(--text)' }}>
-            Avisos al público
+            {t.avisos}
           </div>
           {(!data?.alertas || data.alertas.length === 0) ? (
             <div style={{ color: 'var(--text3)', fontSize: '0.85rem', textAlign: 'center', padding: '14px' }}>
-              ✓ Sin avisos por el momento
+              {t.sinAvisos}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -277,7 +326,7 @@ export default function PublicoPage() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <div style={{ fontFamily: 'var(--font-d)', fontSize: '1.2rem', fontWeight: 700, color: 'var(--cyan)', letterSpacing: '0.03em' }}>
-              Mapa de la red Transmetro
+              {t.mapaTitulo}
             </div>
             <button onClick={() => setMapaModal(false)} style={{
               fontFamily: 'var(--font-d)', fontSize: '0.8rem', fontWeight: 600,
@@ -285,7 +334,7 @@ export default function PublicoPage() {
               color: 'var(--text2)', background: 'var(--surface2)',
               border: '1px solid var(--border)', borderRadius: 'var(--r)',
               padding: '8px 16px', cursor: 'pointer',
-            }}>✕ Cerrar</button>
+            }}>{t.cerrar}</button>
           </div>
           <div style={{ flex: 1, minHeight: 0 }}>
             <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto="100%" />

@@ -48,24 +48,27 @@ export default function BusesPage() {
       setFormData({ placa: '', marca: '', modelo: '', es_electrico: false, capacidad_max: 80, id_linea: '', id_parqueo: '' });
       load();
     } catch (error) {
-      alert(error.response?.data?.message || 'Error al guardar bus');
+      /* la notificación la muestra el interceptor de api.js */
     }
   };
 
   useEffect(() => { load(); }, []);
 
   const filtered = rows.filter(r => {
-    if (filter === 'electrico') return r.es_electrico;
-    if (filter === 'reserva')   return !r.linea_codigo;
+    if (filter === 'electrico')  return r.es_electrico;
+    if (filter === 'combustion') return !r.es_electrico;
+    if (filter === 'reserva')    return !r.linea_codigo;
     return true;
   });
 
   const stats = {
-    total:     rows.length,
-    activos:   rows.filter(r => r.activo).length,
+    total:      rows.length,
+    activos:    rows.filter(r => r.activo).length,
     electricos: rows.filter(r => r.es_electrico).length,
-    reserva:   rows.filter(r => !r.linea_codigo).length,
+    combustion: rows.filter(r => !r.es_electrico).length,
+    reserva:    rows.filter(r => !r.linea_codigo).length,
   };
+  const conteoFiltro = { todos: stats.total, electrico: stats.electricos, combustion: stats.combustion, reserva: stats.reserva };
 
   if (loading) return <Loader />;
 
@@ -86,7 +89,7 @@ export default function BusesPage() {
         {/* Filters and Actions */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
-            {[['todos','Todos'], ['electrico','⚡ Eléctricos'], ['reserva','Reserva']].map(([k, l]) => (
+            {[['todos','Todos'], ['electrico','⚡ Eléctricos'], ['combustion','Combustión'], ['reserva','Reserva']].map(([k, l]) => (
               <button key={k} onClick={() => setFilter(k)} style={{
                 padding: '6px 16px', borderRadius: 'var(--r)',
                 background: filter === k ? 'var(--cyan-dim)' : 'var(--surface)',
@@ -95,9 +98,7 @@ export default function BusesPage() {
                 fontFamily: 'var(--font-d)', fontSize: '0.85rem', fontWeight: 600,
                 cursor: 'pointer', letterSpacing: '0.04em', transition: 'all 0.15s',
               }}>
-                {l} <span style={{ opacity: 0.6, fontSize: '0.78rem' }}>
-                  {k === 'todos' ? rows.length : k === 'electrico' ? stats.electricos : stats.reserva}
-                </span>
+                {l} <span style={{ opacity: 0.6, fontSize: '0.78rem' }}>{conteoFiltro[k]}</span>
               </button>
             ))}
           </div>

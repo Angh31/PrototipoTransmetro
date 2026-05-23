@@ -209,14 +209,6 @@ export default function OperacionPage() {
                 )}
               </div>
             )}
-
-            <div style={{
-              marginTop: '14px', fontSize: '0.72rem', color: 'var(--text3)',
-              padding: '10px 12px', background: 'var(--bg3)', borderRadius: 'var(--r)',
-              borderLeft: '2px solid var(--border2)',
-            }}>
-              <strong style={{ color: 'var(--text2)' }}>Jerarquía aplicada:</strong> REQ-0005 (saturación ≥50%) anula a REQ-0006 (espera por baja carga &lt;25%) cuando ambos se activan a la vez.
-            </div>
           </div>
 
         </div>

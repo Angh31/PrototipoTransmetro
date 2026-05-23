@@ -104,7 +104,7 @@ export default function EstacionesPage() {
         }
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al guardar');
+      /* la notificación la muestra el interceptor de api.js */
     }
   };
 
