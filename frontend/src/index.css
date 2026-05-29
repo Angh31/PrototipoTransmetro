@@ -122,3 +122,34 @@ body {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.25; }
 }
+
+/* ============================================================================
+   Responsive — solo afecta a la vista pública (/publico) para pasajeros.
+   El sistema interno (admin/operador/supervisor/piloto/guardia) se opera
+   desde escritorio, como cualquier centro de control BRT real.
+   ============================================================================ */
+
+/* Tablets (≤ 768px) */
+@media (max-width: 768px) {
+  .publico-header        { padding: 12px 16px !important; flex-wrap: wrap !important; gap: 10px !important; }
+  .publico-header-ctrls  { gap: 8px !important; flex-wrap: wrap !important; justify-content: flex-end !important; }
+  .publico-body          { padding: 16px !important; }
+  .publico-titulo        { font-size: 1.5rem !important; }
+  .publico-subtitulo     { font-size: 0.82rem !important; }
+  .publico-stats         { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .publico-lineas        { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important; }
+  .publico-split         { grid-template-columns: 1fr !important; }
+}
+
+/* Móviles pequeños (≤ 480px) */
+@media (max-width: 480px) {
+  .publico-header        { padding: 10px 12px !important; }
+  .publico-header-brand-sub { display: none !important; }
+  .publico-header-ctrls  { width: 100% !important; }
+  .publico-body          { padding: 12px !important; }
+  .publico-stats         { grid-template-columns: 1fr !important; }
+  .publico-lineas        { grid-template-columns: 1fr !important; }
+  .publico-titulo        { font-size: 1.3rem !important; }
+  .publico-detalle-grid  { grid-template-columns: 1fr 1fr !important; }
+  .publico-stat-value    { font-size: 1.5rem !important; }
+}

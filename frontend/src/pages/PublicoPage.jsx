@@ -50,7 +50,7 @@ const Stat = ({ label, value, accent = 'var(--cyan)' }) => (
     <div style={{ fontSize: '0.7rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
       {label}
     </div>
-    <div style={{ fontFamily: 'var(--font-d)', fontSize: '2rem', fontWeight: 700, color: accent, lineHeight: 1 }}>
+    <div className="publico-stat-value" style={{ fontFamily: 'var(--font-d)', fontSize: '2rem', fontWeight: 700, color: accent, lineHeight: 1 }}>
       {value ?? '—'}
     </div>
   </div>
@@ -114,7 +114,7 @@ export default function PublicoPage() {
       }} />
 
       {/* ── Header pública ─────────────────────────────────────────────────── */}
-      <header style={{
+      <header className="publico-header" style={{
         background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
         padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         position: 'sticky', top: '4px', zIndex: 5,
@@ -125,10 +125,10 @@ export default function PublicoPage() {
             onError={e => e.target.style.display='none'} />
           <div>
             <div style={{ fontFamily: 'var(--font-d)', fontWeight: 700, fontSize: '1.05rem', color: 'var(--cyan)', letterSpacing: '0.04em' }}>TRANSMETRO</div>
-            <div style={{ fontSize: '0.66rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{t.subHeader}</div>
+            <div className="publico-header-brand-sub" style={{ fontSize: '0.66rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{t.subHeader}</div>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div className="publico-header-ctrls" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Selector de idioma */}
           <div style={{ display: 'flex', border: '1px solid var(--border2)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
             {['es', 'en'].map(lang => (
@@ -162,7 +162,7 @@ export default function PublicoPage() {
             color: '#030810', background: 'var(--cyan)', border: 'none',
             borderRadius: 'var(--r)', padding: '6px 14px', cursor: 'pointer',
           }}>{t.verMapa}</button>
-          <Link to="/login" style={{
+          <Link to="/login" title={t.acceso} style={{
             fontFamily: 'var(--font-d)', fontSize: '0.78rem', fontWeight: 600,
             letterSpacing: '0.06em', textTransform: 'uppercase',
             color: 'var(--cyan)', textDecoration: 'none',
@@ -171,33 +171,33 @@ export default function PublicoPage() {
         </div>
       </header>
 
-      <div style={{ padding: '24px 28px', maxWidth: '1280px', margin: '0 auto' }}>
+      <div className="publico-body" style={{ padding: '24px 28px', maxWidth: '1280px', margin: '0 auto' }}>
 
         <div style={{ marginBottom: '24px' }}>
-          <h1 style={{ fontFamily: 'var(--font-d)', fontSize: '1.7rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '0.03em' }}>
+          <h1 className="publico-titulo" style={{ fontFamily: 'var(--font-d)', fontSize: '1.7rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '0.03em' }}>
             {t.titulo}
           </h1>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text2)', marginTop: '4px' }}>
+          <p className="publico-subtitulo" style={{ fontSize: '0.9rem', color: 'var(--text2)', marginTop: '4px' }}>
             {t.subtitulo}
           </p>
         </div>
 
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+        <div className="publico-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px', marginBottom: '24px' }}>
           <Stat label={t.lineasActivas}    value={data?.metricas?.lineas}             accent="var(--cyan)" />
           <Stat label={t.estaciones}        value={data?.metricas?.estaciones}         accent="var(--cyan)" />
           <Stat label={t.busesServicio}     value={data?.metricas?.buses_en_servicio}  accent="var(--green)" />
           <Stat label={t.alertasActivas}    value={data?.metricas?.alertas_activas}    accent={data?.metricas?.alertas_activas > 0 ? 'var(--red)' : 'var(--green)'} />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: lineaSel ? '1fr 380px' : '1fr', gap: '16px' }}>
+        <div className="publico-split" style={{ display: 'grid', gridTemplateColumns: lineaSel ? '1fr 380px' : '1fr', gap: '16px' }}>
 
           {/* Lista de líneas */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px' }}>
             <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', marginBottom: '14px', color: 'var(--text)' }}>
               {t.lineasDisponibles}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
+            <div className="publico-lineas" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
               {data?.lineas?.map(l => (
                 <button key={l.id_linea} onClick={() => verLinea(l)}
                   style={{
@@ -237,7 +237,7 @@ export default function PublicoPage() {
                 <div style={{ color: 'var(--text3)', fontSize: '0.85rem', textAlign: 'center', padding: '20px 0' }}>{t.cargando}</div>
               ) : (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
+                  <div className="publico-detalle-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
                     {[
                       [t.distancia, detalle.distancia_km ? `${detalle.distancia_km} km` : '—'],
                       [t.paradasCol, detalle.estaciones.length],
