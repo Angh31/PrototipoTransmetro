@@ -1,0 +1,45 @@
+# =============================================================================
+# render.yaml — Blueprint de despliegue para Render.com
+# @author Anghel CC
+# @project PrototipoTransmetro — Sistema de Control Integral Transmetro Guatemala
+#
+# Render lee este archivo y provisiona automáticamente:
+#   - Una base de datos PostgreSQL (plan free)
+#   - Un servicio web (Docker) que sirve backend + frontend
+# Las variables de la base se inyectan solas; el JWT_SECRET se genera solo.
+# =============================================================================
+
+databases:
+  - name: transmetro-db
+    databaseName: transmetro_db
+    user: transmetro_user
+    plan: free
+
+services:
+  - type: web
+    name: transmetro
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        fromDatabase: { name: transmetro-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: transmetro-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: transmetro-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: transmetro-db, property: user }
+      - key: DB_PASS
+        fromDatabase: { name: transmetro-db, property: password }
+      - key: DB_SSL
+        value: "false"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: CORS_ORIGIN
+        value: "*"

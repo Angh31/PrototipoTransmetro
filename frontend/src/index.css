@@ -106,3 +106,19 @@ body {
   background: rgba(0, 212, 255, 0.25);
   color: var(--text);
 }
+
+/* ── Impresión (exportar reportes a PDF) ─────────────────────────────────────── */
+@media print {
+  aside { display: none !important; }
+  .no-print { display: none !important; }
+}
+
+/* ── Efecto de cámara CCTV ───────────────────────────────────────────────────── */
+@keyframes scanline {
+  0%   { transform: translateY(-10%); }
+  100% { transform: translateY(1000%); }
+}
+@keyframes blinkRec {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}

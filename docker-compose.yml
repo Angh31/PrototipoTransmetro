@@ -49,6 +49,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      - ./database:/app/database   # esquema + seed para auto-init en dev
       - /app/node_modules
     networks:
       - transmetro-net

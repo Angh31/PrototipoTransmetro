@@ -4,7 +4,6 @@
 > Municipalidad de Guatemala · Dirección de Movilidad Urbana
 
 **@author** Anghel CC
-**Colegiado Activo** · Reg. No. 15847-2018
 **Año** 2026
 
 ---
@@ -14,6 +13,17 @@
 El Sistema de Control Integral Transmetro es una plataforma web centralizada para la gestión y monitoreo en tiempo real de la red de transporte público Transmetro de la Ciudad de Guatemala. Resuelve la falta de conectividad entre las estaciones (las actuales *islas de información*) y automatiza el control de capacidad, alertas, flota, pilotos y personal de seguridad.
 
 Cubre 10 rutas activas, ~100 estaciones, ~33 buses (incluyendo la flota eléctrica BYD de la Línea 5), gestión de personal, alertas en tiempo real y un dashboard centralizado.
+
+---
+
+## Documentación
+
+| Documento | Descripción |
+| --------- | ----------- |
+| [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Arquitectura técnica: stack, modelo de datos, reglas de negocio, API, seguridad |
+| [docs/MANUAL_DE_USUARIO.md](docs/MANUAL_DE_USUARIO.md) | Guía de uso por rol y por módulo |
+| [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) | Despliegue local (Docker) y en producción (Render) |
+| docs/Plan_de_Pruebas_Transmetro.docx | Plan y casos de prueba del prototipo |
 
 ---
 
@@ -131,16 +141,15 @@ cmd /c "docker exec -i transmetro_db psql -U transmetro_user -d transmetro_db < 
 
 ## Usuarios de prueba
 
-Todos comparten la contraseña `admin2026`.
+Las credenciales de acceso se entregan por separado al evaluador (no se publican en el repositorio por seguridad). El sistema incluye tres tipos de cuenta:
 
-| Usuario                 | Rol         | Acceso                                                                 |
-| ----------------------- | ----------- | ---------------------------------------------------------------------- |
-| `admin`                 | admin       | Total — todos los módulos                                              |
-| `supervisor_l5`         | supervisor  | Operativo + Flota + Pilotos + Líneas (sin operaciones de estación)     |
-| `operador_colón`        | operador    | Dashboard, Operación, Estaciones, Alertas                              |
-| `operador_centra_norte` | operador    | Igual que el anterior                                                  |
+| Rol         | Acceso                                                              |
+| ----------- | ------------------------------------------------------------------ |
+| Administrador | Total — todos los módulos, incluidos Usuarios y Auditoría        |
+| Supervisor  | Operación, Flota, Pilotos, Líneas y Reportes                       |
+| Operador    | Dashboard, Operación, Estaciones, Alertas, Cámaras y Tarjeta       |
 
-La vista `/publico` no requiere autenticación.
+Los nombres de usuario siguen la convención `nombre.apellido` (sin tildes). La vista `/publico` no requiere autenticación.
 
 ---
 
@@ -178,16 +187,18 @@ La vista `/publico` no requiere autenticación.
 
 ## Roles y permisos (autorización)
 
-| Acción                                | admin | supervisor | operador |
-| ------------------------------------- | :---: | :--------: | :------: |
-| Ver dashboard, líneas, estaciones, flota, alertas | ✓ | ✓ | ✓ |
-| Ver pilotos (datos sensibles)         |   ✓   |     ✓      |          |
-| Crear / editar líneas                 |   ✓   |     ✓      |          |
-| Crear / editar estaciones             |   ✓   |     ✓      |          |
-| Crear / editar buses                  |   ✓   |     ✓      |          |
-| Crear / editar pilotos                |   ✓   |     ✓      |          |
-| Operación (registro en estación)      |   ✓   |     ✓      |     ✓    |
-| Resolver alertas                      |   ✓   |     ✓      |     ✓    |
+| Acción                                | admin | supervisor | operador | piloto | guardia |
+| ------------------------------------- | :---: | :--------: | :------: | :----: | :-----: |
+| Ver dashboard, líneas, estaciones, flota, alertas | ✓ | ✓ | ✓ | parcial | parcial |
+| Ver pilotos (datos sensibles)         |   ✓   |     ✓      |          |        |         |
+| Crear / editar líneas                 |   ✓   |     ✓      |          |        |         |
+| Crear / editar estaciones             |   ✓   |     ✓      |          |        |         |
+| Crear / editar buses                  |   ✓   |     ✓      |          |        |         |
+| Crear / editar pilotos                |   ✓   |     ✓      |          |        |         |
+| Operación (registro en estación)      |   ✓   |     ✓      |     ✓    |        |         |
+| Resolver alertas                      |   ✓   |     ✓      |     ✓    |        |    ✓    |
+| Mi Operación (consulta de rutas / recorridos) |       |            |          |   ✓    |         |
+| Control de accesos por estación       |       |            |          |        |    ✓    |
 
 El backend valida cada permiso con `requireRole(...)`; el frontend filtra el menú lateral y muestra un toast si un acceso es rechazado por permisos.
 
@@ -234,7 +245,7 @@ docker compose up -d --build
 
 ## Pruebas funcionales sugeridas
 
-1. **Login y roles**: ingresar como `admin`, ver todo. Cerrar sesión, ingresar como `operador_colón` — el menú no muestra Flota ni Pilotos ni Líneas. Intentar acceder a `/pilotos` por URL: el sistema rechaza y muestra un toast.
+1. **Login y roles**: ingresar como administrador, ver todo. Cerrar sesión, ingresar como operador — el menú no muestra Flota ni Pilotos ni Líneas. Intentar acceder a `/pilotos` por URL: el sistema rechaza y muestra un toast.
 2. **Trigger BYD**: crear un bus con la marca BYD marcando "Es eléctrico", asignarlo a un parqueo sin carga eléctrica — el sistema lo rechaza.
 3. **Simulador de Operación**: registrar un evento con ocupación de estación ≥ 50% de capacidad — se genera una alerta de saturación y aparece en tiempo real en el Centro de Alertas (Socket.io).
 4. **Eficiencia 25%**: registrar un bus con menos del 25% de carga — la respuesta indica espera de 5 minutos.

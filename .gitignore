@@ -31,3 +31,6 @@ postgres-data/
 
 # Coverage
 coverage/
+
+# Entregables con credenciales — se comparten por separado, no en el repo público
+docs/*.docx

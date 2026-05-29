@@ -34,7 +34,7 @@ const crearUsuario = async (req, res, next) => {
     const pol = validarPassword(password);
     if (!pol.ok)
       return res.status(400).json({ ok: false, message: pol.message });
-    if (!['admin', 'supervisor', 'operador'].includes(rol))
+    if (!['admin', 'supervisor', 'operador', 'piloto', 'guardia'].includes(rol))
       return res.status(400).json({ ok: false, message: 'Rol inválido' });
 
     const hash = bcrypt.hashSync(password, 10);
@@ -54,7 +54,7 @@ const actualizarUsuario = async (req, res, next) => {
   try {
     const { rol, activo } = req.body;
     const id = parseInt(req.params.id);
-    if (rol && !['admin', 'supervisor', 'operador'].includes(rol))
+    if (rol && !['admin', 'supervisor', 'operador', 'piloto', 'guardia'].includes(rol))
       return res.status(400).json({ ok: false, message: 'Rol inválido' });
 
     // Estado actual del usuario objetivo

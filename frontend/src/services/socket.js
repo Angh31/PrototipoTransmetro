@@ -7,7 +7,8 @@
 
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+// En producción (sin VITE_SOCKET_URL) se conecta al mismo dominio que sirve la app.
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || window.location.origin;
 
 let socket = null;
 

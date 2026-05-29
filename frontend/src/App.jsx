@@ -15,10 +15,14 @@ import EstacionesPage from './pages/EstacionesPage';
 import BusesPage      from './pages/BusesPage';
 import PilotosPage    from './pages/PilotosPage';
 import AlertasPage    from './pages/AlertasPage';
+import MonitoreoPage  from './pages/MonitoreoPage';
+import TarjetaPage    from './pages/TarjetaPage';
 import PublicoPage    from './pages/PublicoPage';
 import UsuariosPage   from './pages/UsuariosPage';
 import AuditoriaPage  from './pages/AuditoriaPage';
 import ReportesPage   from './pages/ReportesPage';
+import PilotoPage     from './pages/PilotoPage';
+import GuardiaPage    from './pages/GuardiaPage';
 import { Toast }      from './components/ui';
 
 const ProtectedRoute = ({ children }) => {
@@ -50,6 +54,10 @@ export default function App() {
             <Route path="buses"      element={<BusesPage />} />
             <Route path="pilotos"    element={<PilotosPage />} />
             <Route path="alertas"    element={<AlertasPage />} />
+            <Route path="monitoreo"  element={<MonitoreoPage />} />
+            <Route path="tarjeta"    element={<TarjetaPage />} />
+            <Route path="piloto"     element={<PilotoPage />} />
+            <Route path="guardia"    element={<GuardiaPage />} />
             <Route path="usuarios"   element={<UsuariosPage />} />
             <Route path="reportes"   element={<ReportesPage />} />
             <Route path="auditoria"  element={<AuditoriaPage />} />

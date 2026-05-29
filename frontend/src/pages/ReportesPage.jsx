@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import api from '../services/api';
-import { PageHeader, StatCard, Loader, Badge } from '../components/ui';
+import { PageHeader, StatCard, Loader, Badge, Btn } from '../components/ui';
 
 const RANGOS = [['hoy', 'Hoy'], ['semana', 'Semana'], ['mes', 'Mes']];
 const TIPO_COLOR = { capacidad: 'var(--red)', espera: 'var(--amber)', seguridad: 'var(--cyan)', operacional: 'var(--text2)' };
@@ -43,9 +43,52 @@ export default function ReportesPage() {
   const maxTipo = Math.max(1, ...(data?.por_tipo?.map(t => parseInt(t.total)) || [1]));
   const maxEst  = Math.max(1, ...(data?.por_estacion?.map(e => parseInt(e.total)) || [1]));
 
+  const nombreRango = { hoy: 'Hoy', semana: 'Última semana', mes: 'Último mes' }[rango] || rango;
+
+  const exportarCSV = () => {
+    if (!data) return;
+    const L = [];
+    L.push(`Reporte Transmetro - ${nombreRango}`);
+    L.push(`Generado,${new Date().toLocaleString('es-GT')}`);
+    L.push('');
+    L.push('RESUMEN');
+    L.push(`Alertas en el periodo,${data.resumen.total}`);
+    L.push(`Resueltas,${data.resumen.resueltas}`);
+    L.push(`Criticas/altas,${data.resumen.criticas}`);
+    L.push(`Sin resolver,${data.resumen.activas}`);
+    L.push('');
+    L.push('ALERTAS POR DIA');
+    L.push('Dia,Total');
+    (data.por_dia || []).forEach(d => L.push(`${d.dia},${d.total}`));
+    L.push('');
+    L.push('ALERTAS POR TIPO');
+    L.push('Tipo,Total');
+    (data.por_tipo || []).forEach(t => L.push(`${t.tipo},${t.total}`));
+    L.push('');
+    L.push('ESTACIONES CON MAS ALERTAS');
+    L.push('Estacion,Total');
+    (data.por_estacion || []).forEach(e => L.push(`${e.nombre},${e.total}`));
+    const blob = new Blob(['﻿' + L.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_transmetro_${rango}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="fade-up">
-      <PageHeader title="Reportes y Estadísticas" subtitle="Indicadores operativos por rango de fecha" />
+      <PageHeader
+        title="Reportes y Estadísticas"
+        subtitle="Indicadores operativos por rango de fecha"
+        actions={
+          <>
+            <Btn small ghost onClick={() => window.print()} disabled={!data}>🖨 Imprimir / PDF</Btn>
+            <Btn small onClick={exportarCSV} disabled={!data}>⤓ Exportar CSV</Btn>
+          </>
+        }
+      />
 
       <div style={{ padding: '20px 28px' }}>
 

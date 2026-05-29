@@ -9,21 +9,25 @@ import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-import { MedidorPassword } from '../ui';
+import { MedidorPassword, PasswordInput } from '../ui';
 
 /* ── SVG Logo (compacto) removed in favor of LogoT.png ── */
 
 const ALL_NAV = [
-  { to: '/',           icon: '▦', label: 'Dashboard',  roles: ['admin', 'supervisor', 'operador', 'guardia'] },
-  { to: '/operacion',  icon: '⚡', label: 'Operación', roles: ['admin', 'operador', 'supervisor'] },
-  { to: '/lineas',     icon: '⬡', label: 'Líneas',     roles: ['admin', 'supervisor', 'guardia'] },
-  { to: '/estaciones', icon: '◎', label: 'Estaciones', roles: ['admin', 'operador', 'guardia'] },
-  { to: '/buses',      icon: '⬛', label: 'Flota',      roles: ['admin', 'supervisor'] },
-  { to: '/pilotos',    icon: '◈', label: 'Pilotos',    roles: ['admin', 'supervisor'] },
-  { to: '/alertas',    icon: '◉', label: 'Alertas',    roles: ['admin', 'operador', 'supervisor', 'guardia'] },
-  { to: '/reportes',   icon: '▣', label: 'Reportes',   roles: ['admin', 'supervisor'] },
-  { to: '/usuarios',   icon: '⚙', label: 'Usuarios',   roles: ['admin'] },
-  { to: '/auditoria',  icon: '▤', label: 'Auditoría',  roles: ['admin'] },
+  { to: '/',           icon: '▦', label: 'Dashboard',     roles: ['admin', 'supervisor', 'operador', 'guardia', 'piloto'] },
+  { to: '/operacion',  icon: '⚡', label: 'Operación',    roles: ['admin', 'operador', 'supervisor'] },
+  { to: '/piloto',     icon: '⊙', label: 'Mi Operación', roles: ['piloto'] },
+  { to: '/guardia',    icon: '⊟', label: 'Accesos',      roles: ['guardia'] },
+  { to: '/lineas',     icon: '⬡', label: 'Líneas',       roles: ['admin', 'supervisor'] },
+  { to: '/estaciones', icon: '◎', label: 'Estaciones',   roles: ['admin', 'operador', 'guardia'] },
+  { to: '/buses',      icon: '⬛', label: 'Flota',        roles: ['admin', 'supervisor'] },
+  { to: '/pilotos',    icon: '◈', label: 'Pilotos',      roles: ['admin', 'supervisor'] },
+  { to: '/alertas',    icon: '◉', label: 'Alertas',      roles: ['admin', 'operador', 'supervisor', 'guardia', 'piloto'] },
+  { to: '/monitoreo',  icon: '⊡', label: 'Cámaras',      roles: ['admin', 'operador', 'supervisor', 'guardia'] },
+  { to: '/tarjeta',    icon: '⊞', label: 'Tarjeta',      roles: ['admin', 'operador', 'supervisor'] },
+  { to: '/reportes',   icon: '▣', label: 'Reportes',     roles: ['admin', 'supervisor'] },
+  { to: '/usuarios',   icon: '⚙', label: 'Usuarios',     roles: ['admin'] },
+  { to: '/auditoria',  icon: '▤', label: 'Auditoría',    roles: ['admin'] },
 ];
 
 export default function Layout() {
@@ -225,7 +229,7 @@ export default function Layout() {
             }} />
             En línea
           </span>
-          <span style={{ color: 'var(--text3)', fontFamily: 'var(--font-d)', letterSpacing: '0.06em' }}>
+          <span style={{ color: 'var(--text2)', fontFamily: 'var(--font-d)', letterSpacing: '0.08em', fontSize: '0.95rem', fontWeight: 600 }}>
             {clock}
           </span>
         </div>
@@ -238,10 +242,10 @@ export default function Layout() {
           <div className="fade-up" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', width: '100%', maxWidth: '380px', padding: '24px' }}>
             <h3 style={{ fontFamily: 'var(--font-d)', marginBottom: '16px', color: 'var(--cyan)' }}>Cambiar mi contraseña</h3>
             <form onSubmit={cambiarPassword} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <input type="password" placeholder="Contraseña actual" required value={pwd.actual}
+              <PasswordInput placeholder="Contraseña actual" required value={pwd.actual}
                 onChange={e => setPwd({ ...pwd, actual: e.target.value })}
                 style={{ padding: '9px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--r)' }} autoFocus />
-              <input type="password" placeholder="Nueva contraseña" required value={pwd.nueva}
+              <PasswordInput placeholder="Nueva contraseña" required value={pwd.nueva}
                 onChange={e => setPwd({ ...pwd, nueva: e.target.value })}
                 style={{ padding: '9px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--r)' }} />
               <MedidorPassword password={pwd.nueva} />

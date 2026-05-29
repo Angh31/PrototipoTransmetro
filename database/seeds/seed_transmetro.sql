@@ -35,8 +35,8 @@ INSERT INTO lineas (nombre, codigo, distancia_km, id_municipio) VALUES
   ('Línea 1 — Centro Histórico',          'L1',   8.5,  1),
   ('Línea 2 — Periférico',                'L2',   12.0, 1),
   ('Línea 5 — Eléctrica BYD',             'L5',   12.0, 1),
-  ('Línea 6 — Parque Colón',              'L6',   15.0, 1),
-  ('Línea 7 — Ruta Larga',                'L7',   24.0, 1),
+  ('Línea 6 — Zona 1 a Zona 6',           'L6',   13.0, 1),
+  ('Línea 7 — Periférico (USAC–Centro)',  'L7',   24.0, 1),
   ('Línea 12 — Centra Sur',               'L12',  18.0, 3),
   ('Línea 13 — Hangares / Plaza España',  'L13',  16.0, 1),
   ('Línea 18 — Mixco',                    'L18',  14.0, 2),
@@ -131,6 +131,15 @@ ON CONFLICT DO NOTHING;
 INSERT INTO linea_estacion (id_linea, id_estacion, orden_visita, distancia_km) VALUES
   (7, 19, 1, 1.50),
   (7, 20, 2, 1.80)
+ON CONFLICT DO NOTHING;
+
+-- L12 (Centra Sur → Centro, 5 estaciones — coincide con sus 5 buses)
+INSERT INTO linea_estacion (id_linea, id_estacion, orden_visita, distancia_km) VALUES
+  (6, 21, 1, 7.50),
+  (6, 22, 2, 0.50),
+  (6, 23, 3, 4.00),
+  (6,  5, 4, 0.30),
+  (6,  8, 5, NULL)
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
@@ -242,14 +251,16 @@ ON CONFLICT DO NOTHING;
 
 -- =============================================================================
 -- USUARIOS DEL SISTEMA
--- password_hash corresponde a bcrypt de 'admin2026' (rounds=10)
--- Generado con: bcryptjs.hashSync('admin2026', 10)
+-- password_hash de demostración (bcrypt, rounds=10).
+-- La contraseña en claro no se publica; se entrega por separado al evaluador.
 -- =============================================================================
 INSERT INTO usuarios (username, password_hash, rol, id_operador) VALUES
-  ('admin',            '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'admin',      NULL),
-  ('supervisor_l5',    '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'supervisor', NULL),
-  ('operador_colón',   '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'operador',   2),
-  ('operador_centra_norte','$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'operador', 1)
+  ('admin',              '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'admin',      NULL),
+  ('supervisor.flota',   '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'supervisor', NULL),
+  ('francisco.alvarado', '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'operador',   2),
+  ('diana.cordon',       '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'operador',   1),
+  ('ana.lopez',          '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'piloto',     NULL),
+  ('carlos.mendez',      '$2a$10$x27mzNyCSE5bZxAE5MaitO/VCEtmpJXYSszgHVR2CfBzfKyweHnX2', 'guardia',    NULL)
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================

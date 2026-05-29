@@ -13,6 +13,8 @@ const pool = new Pool({
   database: process.env.DB_NAME     || 'transmetro_db',
   user:     process.env.DB_USER     || 'transmetro_user',
   password: process.env.DB_PASS     || 'transmetro_pass_2026',
+  // Algunos proveedores en la nube (conexión externa) requieren SSL: poné DB_SSL=true
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,

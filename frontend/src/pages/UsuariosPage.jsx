@@ -7,10 +7,16 @@
 
 import { useEffect, useState } from 'react';
 import api from '../services/api';
-import { PageHeader, Table, Badge, Loader, Btn, MedidorPassword } from '../components/ui';
+import { PageHeader, Table, Badge, Loader, Btn, MedidorPassword, PasswordInput } from '../components/ui';
 
-const ROL_COLOR = { admin: 'var(--red)', supervisor: 'var(--amber)', operador: 'var(--cyan)' };
-const ROLES = ['admin', 'supervisor', 'operador'];
+const ROL_COLOR = {
+  admin:      'var(--red)',
+  supervisor: 'var(--amber)',
+  operador:   'var(--cyan)',
+  piloto:     'var(--green)',
+  guardia:    'var(--purple, #a78bfa)',
+};
+const ROLES = ['admin', 'supervisor', 'operador', 'piloto', 'guardia'];
 
 const inputStyle = { padding: '8px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--r)', width: '100%' };
 
@@ -200,7 +206,7 @@ export default function UsuariosPage() {
                 <>
                   <input placeholder="Nombre de usuario" required value={form.username}
                     onChange={e => setForm({ ...form, username: e.target.value })} style={inputStyle} />
-                  <input type="password" placeholder="Contraseña" required value={form.password}
+                  <PasswordInput placeholder="Contraseña" required value={form.password}
                     onChange={e => setForm({ ...form, password: e.target.value })} style={inputStyle} />
                   <MedidorPassword password={form.password} />
                 </>
@@ -228,7 +234,7 @@ export default function UsuariosPage() {
               Nueva contraseña para <strong>{selected?.username}</strong>.
             </p>
             <form onSubmit={guardarPwd} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <input type="password" placeholder="Nueva contraseña" required value={nuevaPwd}
+              <PasswordInput placeholder="Nueva contraseña" required value={nuevaPwd}
                 onChange={e => setNuevaPwd(e.target.value)} style={inputStyle} autoFocus />
               <MedidorPassword password={nuevaPwd} />
               <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>

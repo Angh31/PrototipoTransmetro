@@ -102,7 +102,7 @@ export default function OperacionPage() {
     <div className="fade-up">
       <PageHeader
         title="Centro de Mando · Operación"
-        subtitle="Registro de eventos y validación de reglas críticas (REQ-0001 · REQ-0005 · REQ-0006)"
+        subtitle="Registro de eventos y validación de reglas de operación"
       />
 
       <div style={{ padding: '20px 28px' }}>

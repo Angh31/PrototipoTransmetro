@@ -23,7 +23,7 @@ const T = {
     distancia: 'Distancia', paradasCol: 'Paradas', busesCol: 'Buses', municipio: 'Municipio',
     recorrido: 'Recorrido', cargando: 'Cargando…',
     mapaRed: 'Mapa de la red', estacionesGeo: 'estaciones geolocalizadas', ampliar: '↗ Ampliar mapa', verMapa: '🗺 Ver mapa',
-    avisos: 'Avisos al público', sinAvisos: '✓ Sin avisos por el momento',
+    avisos: 'Avisos al público', sinAvisos: '✓ Sin avisos por el momento', verAvisos: '🔔 Avisos',
     mapaTitulo: 'Mapa de la red Transmetro', cerrar: '✕ Cerrar', cargandoPublica: 'Cargando información pública...',
   },
   en: {
@@ -35,7 +35,7 @@ const T = {
     distancia: 'Distance', paradasCol: 'Stops', busesCol: 'Buses', municipio: 'Municipality',
     recorrido: 'Route', cargando: 'Loading…',
     mapaRed: 'Network map', estacionesGeo: 'geolocated stations', ampliar: '↗ Expand map', verMapa: '🗺 View map',
-    avisos: 'Public notices', sinAvisos: '✓ No notices at the moment',
+    avisos: 'Public notices', sinAvisos: '✓ No notices at the moment', verAvisos: '🔔 Notices',
     mapaTitulo: 'Transmetro network map', cerrar: '✕ Close', cargandoPublica: 'Loading public information...',
   },
 };
@@ -106,11 +106,18 @@ export default function PublicoPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
+      {/* ── Cinta institucional Transmetro (acento de marca oficial) ──────── */}
+      <div style={{
+        height: '4px', width: '100%',
+        background: 'linear-gradient(90deg, #00A859 0%, #00A859 55%, #F58220 55%, #F58220 100%)',
+        position: 'sticky', top: 0, zIndex: 6,
+      }} />
+
       {/* ── Header pública ─────────────────────────────────────────────────── */}
       <header style={{
         background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
         padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 5,
+        position: 'sticky', top: '4px', zIndex: 5,
         backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -137,6 +144,18 @@ export default function PublicoPage() {
             <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--green)', boxShadow: '0 0 6px var(--green)' }} />
             {t.enVivo} · {clock}
           </span>
+          <button onClick={() => document.getElementById('seccion-avisos')?.scrollIntoView({ behavior: 'smooth' })} style={{
+            fontFamily: 'var(--font-d)', fontSize: '0.78rem', fontWeight: 600,
+            letterSpacing: '0.06em', textTransform: 'uppercase',
+            color: 'var(--cyan)', background: 'var(--surface2)',
+            border: '1px solid var(--cyan2)', borderRadius: 'var(--r)', padding: '6px 14px', cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+          }}>
+            {t.verAvisos}
+            {data?.alertas?.length > 0 && (
+              <span style={{ background: 'var(--red)', color: '#fff', borderRadius: '10px', padding: '0 6px', fontSize: '0.68rem' }}>{data.alertas.length}</span>
+            )}
+          </button>
           <button onClick={() => setMapaModal(true)} style={{
             fontFamily: 'var(--font-d)', fontSize: '0.78rem', fontWeight: 600,
             letterSpacing: '0.06em', textTransform: 'uppercase',
@@ -255,28 +274,8 @@ export default function PublicoPage() {
           )}
         </div>
 
-        {/* Mapa interactivo de la red (compacto + botón ampliar) */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginTop: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-              <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
-                {t.mapaRed}
-              </div>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>{data?.estaciones?.filter(e => e.lat).length || 0} {t.estacionesGeo}</span>
-            </div>
-            <button onClick={() => setMapaModal(true)} style={{
-              fontFamily: 'var(--font-d)', fontSize: '0.74rem', fontWeight: 600,
-              letterSpacing: '0.06em', textTransform: 'uppercase',
-              color: 'var(--cyan)', background: 'var(--surface2)',
-              border: '1px solid var(--cyan2)', borderRadius: 'var(--r)',
-              padding: '6px 14px', cursor: 'pointer',
-            }}>{t.ampliar}</button>
-          </div>
-          <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto={320} />
-        </div>
-
         {/* Alertas activas (avisos al público) */}
-        <div style={{ marginTop: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px' }}>
+        <div id="seccion-avisos" style={{ marginTop: '16px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', scrollMarginTop: '70px' }}>
           <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', marginBottom: '14px', color: 'var(--text)' }}>
             {t.avisos}
           </div>
@@ -313,8 +312,32 @@ export default function PublicoPage() {
           )}
         </div>
 
-        <footer style={{ marginTop: '32px', textAlign: 'center', fontSize: '0.72rem', color: 'var(--text3)', letterSpacing: '0.06em' }}>
-          Sistema de Control Integral Transmetro · Municipalidad de Guatemala · 2026 · @author Anghel CC
+        {/* Mapa interactivo de la red (compacto + botón ampliar) */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: '20px', marginTop: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+              <div style={{ fontFamily: 'var(--font-d)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)' }}>
+                {t.mapaRed}
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>{data?.estaciones?.filter(e => e.lat).length || 0} {t.estacionesGeo}</span>
+            </div>
+            <button onClick={() => setMapaModal(true)} style={{
+              fontFamily: 'var(--font-d)', fontSize: '0.74rem', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--cyan)', background: 'var(--surface2)',
+              border: '1px solid var(--cyan2)', borderRadius: 'var(--r)',
+              padding: '6px 14px', cursor: 'pointer',
+            }}>{t.ampliar}</button>
+          </div>
+          <MapaRed estaciones={data?.estaciones || []} recorridos={data?.recorridos || []} alto={320} />
+        </div>
+
+        <footer style={{
+          marginTop: '32px', textAlign: 'center', fontSize: '0.72rem',
+          color: 'var(--text3)', letterSpacing: '0.06em',
+          borderTop: '2px solid #00A859', paddingTop: '14px',
+        }}>
+          <span style={{ color: '#00A859', fontWeight: 600 }}>●</span> Sistema de Control Integral Transmetro · Municipalidad de Guatemala · 2026
         </footer>
       </div>
 

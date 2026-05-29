@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS sistema_metadata (
 
 INSERT INTO sistema_metadata (clave, valor) VALUES
   ('autor',        'Anghel CC'),
-  ('registro',     'No. 15847-2018'),
   ('proyecto',     'PrototipoTransmetro'),
   ('descripcion',  'Sistema de Control Integral — Transmetro Guatemala'),
   ('version',      '1.0.0'),

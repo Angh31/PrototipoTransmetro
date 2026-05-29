@@ -32,7 +32,7 @@ export const PageHeader = ({ title, subtitle, actions }) => (
 );
 
 // ── StatCard ─────────────────────────────────────────────────────────────────
-export const StatCard = ({ label, value, sub, accent = 'var(--cyan)', icon, delay = 0 }) => (
+export const StatCard = ({ label, value, sub, accent = 'var(--cyan)', icon, delay = 0, valueSize = '2rem' }) => (
   <div className={`fade-up-${delay}`} style={{
     background: 'var(--surface)',
     border: '1px solid var(--border)',
@@ -50,7 +50,7 @@ export const StatCard = ({ label, value, sub, accent = 'var(--cyan)', icon, dela
         <div style={{ fontSize: '0.7rem', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
           {label}
         </div>
-        <div style={{ fontFamily: 'var(--font-d)', fontSize: '2rem', fontWeight: 700, color: accent, lineHeight: 1 }}>
+        <div style={{ fontFamily: 'var(--font-d)', fontSize: valueSize, fontWeight: 700, color: accent, lineHeight: 1.1 }}>
           {value ?? '—'}
         </div>
         {sub && <div style={{ fontSize: '0.75rem', color: 'var(--text2)', marginTop: '5px' }}>{sub}</div>}
@@ -215,6 +215,36 @@ export const MedidorPassword = ({ password = '' }) => {
           </span>
         ))}
       </div>
+    </div>
+  );
+};
+
+// ── PasswordInput (con botón mostrar/ocultar) ───────────────────────────────────
+const IconoOjo = ({ off }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+    {off && <line x1="3" y1="3" x2="21" y2="21" />}
+  </svg>
+);
+
+export const PasswordInput = ({ style, ...props }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <input {...props} type={show ? 'text' : 'password'}
+        style={{ ...style, width: '100%', paddingRight: '40px', boxSizing: 'border-box' }} />
+      <button type="button" tabIndex={-1} onClick={() => setShow(s => !s)}
+        title={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        style={{
+          position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: show ? 'var(--cyan)' : 'var(--text3)',
+          padding: 0, lineHeight: 0, display: 'flex', alignItems: 'center',
+        }}>
+        <IconoOjo off={show} />
+      </button>
     </div>
   );
 };

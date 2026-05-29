@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { PasswordInput } from '../components/ui';
 
 const S = {
   wrap: {
@@ -130,7 +131,7 @@ export default function LoginPage() {
 
           <div style={S.inputWrap}>
             <label style={S.label}>Contraseña</label>
-            <input type="password" style={S.input} value={password}
+            <PasswordInput style={S.input} value={password}
               onChange={e => setPassword(e.target.value)} placeholder="••••••••"
               onFocus={e => e.target.style.borderColor='var(--cyan2)'}
               onBlur={e => e.target.style.borderColor='var(--border)'} />
